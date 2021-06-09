@@ -1,6 +1,6 @@
-import time
-import datetime
 import requests
+from time import strptime
+from datetime import date
 from typing import Dict
 from dotenv import dotenv_values
 
@@ -37,9 +37,9 @@ class LastFM:
     @staticmethod
     def __date_seconds(date_input: str) -> str:
         """Converts the date_input string ('YYYY-MM-DD') to the Unix Timestamp notation."""
-        date = time.strptime(date_input, "%Y-%m-%d")      # converts the date string to struct_time
+        date_output = strptime(date_input, "%Y-%m-%d")      # converts the date string to struct_time
 
-        return f"{(datetime.date(date.tm_year, date.tm_mon, date.tm_mday) - datetime.date(1970, 1, 1)).total_seconds():.0f}"    # instead of returning a float (e.g., 629510400.0), it returns a string (e.g., '629510400')
+        return f"{(date(date_output.tm_year, date_output.tm_mon, date_output.tm_mday) - date(1970, 1, 1)).total_seconds():.0f}"    # instead of returning a float (e.g., 629510400.0), it returns a string (e.g., '629510400')
             
 
     def get_recent_tracks(self, user: str, from_date: str, to_date: str, limit: int = 50, page: int = 1) -> requests.models.Response:
