@@ -56,6 +56,8 @@ class LastFM:
         Returns:
             The server response with the user's recent played tracks
         """
+        # creating the payload message to send to the Last.fm servers
+        if limit > 200: limit = 200
         payload = {
             'method': 'user.getrecenttracks', 
             'user': user,
