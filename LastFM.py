@@ -57,13 +57,12 @@ class LastFM:
             The server response with the user's recent played tracks
         """
         # creating the payload message to send to the Last.fm servers
-        if limit > 200: limit = 200
         payload = {
             'method': 'user.getrecenttracks', 
             'user': user,
             'from': self.__date_seconds(from_date), 
             'to': self.__date_seconds(to_date),
-            'limit': str(limit),
+            'limit': str( max(1, min(limit, 200)) ),
             'page': str(page)
         }
 
@@ -72,6 +71,6 @@ class LastFM:
 
 if __name__ == '__main__':
     api = LastFM()
-    response = api.get_recent_tracks('Vini_Bueno', '2019-01-01', '2020-01-01')
+    response = api.get_recent_tracks('Vini_Bueno', '2019-01-01', '2020-01-01', limit=400)
     print( response.status_code )
-    print( response.json() )
+    # print( response.json() )
