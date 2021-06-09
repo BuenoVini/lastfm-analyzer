@@ -32,14 +32,14 @@ class AnalyzerFM():
                 print(response.text)
                 exit(1)
             
-            # print current response and append it to pages
-            print(response.status_code, current_page, response.json()['recenttracks']['@attr']['totalPages'])
+            # append current response to pages
             pages.append(response.json())
 
             # verifying if the current page does not exceed the max page number... if it does (last one), break the loop
             if current_page < int(response.json()['recenttracks']['@attr']['totalPages']):
                 # verifying if the response came from the server (and not from the cache)
                 if not getattr(response, 'from_cache', False):
+                    print(response.status_code, current_page, response.json()['recenttracks']['@attr']['totalPages'])
                     sleep(0.25)
                 
                 current_page += 1
@@ -54,7 +54,12 @@ class AnalyzerFM():
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
 
+    
+    def top_artists(self, start: int = 0, stop: int = -1) -> pd.DataFrame:
+        return self.df['Artist'].value_counts().iloc[start:stop]
+
 
 if __name__ == '__main__':
     analyzer = AnalyzerFM('Vini_Bueno')
-    print(analyzer.df)
+    # print(analyzer.df)
+    print(analyzer.top_artists(stop=20))
