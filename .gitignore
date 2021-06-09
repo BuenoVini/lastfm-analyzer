@@ -1,2 +1,4 @@
 .env
 sandbox
+__pycache__
+*.sqlite
