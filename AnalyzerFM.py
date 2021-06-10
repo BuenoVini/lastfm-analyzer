@@ -1,3 +1,4 @@
+from typing import List
 from time import sleep
 from LastFM import LastFM
 from datetime import date
@@ -59,15 +60,37 @@ class AnalyzerFM():
 
 
     @staticmethod
-    def __top(df: pd.DataFrame, category: str) -> pd.DataFrame:
-        return df[category].value_counts()
+    def __top(df: pd.DataFrame, category: str) -> List[str]:
+        """Finds the top category (Artist, Song or Album) in the given dataframe and returns a list with them."""
+        return df[category].value_counts().index.tolist()
 
 
-    def top_by_month(self, category: str, year: int, month: int) -> pd.DataFrame:
+    def top_by_month(self, category: str, year: int, month: int) -> List[str]:
+        """
+        Finds the top category (Artist, Song or Album) of a specif month of the given year
+
+        Parameters:
+            category: can be either 'Artist', 'Song' or 'Album'
+            year: disered year (YYYY)
+            month: disered month (MM)
+
+        Returns:
+            A list with the top category for the given month
+        """
         return self.__top(self.df[ (self.df['Date'].dt.year == year) & (self.df['Date'].dt.month == month) ], category)
 
 
-    def top_by_year(self, category: str, year: int) -> pd.DataFrame:
+    def top_by_year(self, category: str, year: int) -> List[str]:
+        """
+        Finds the top category (Artist, Song or Album) of the whole year
+
+        Parameters:
+            category: can be either 'Artist', 'Song' or 'Album'
+            year: disered year (YYYY)
+
+        Returns:
+            A list with the top category for the given year
+        """
         return self.__top(self.df[ self.df['Date'].dt.year == year ], category)
 
 
@@ -78,4 +101,4 @@ if __name__ == '__main__':
     #     print(f"\n2021-{month}", *analyzer.top_by_month('Album', 2021, month)[0:10].index.tolist(), sep='\n')
 
     for year in [2018, 2019, 2020, 2021]:
-        print(f"\n{year}", *analyzer.top_by_year('Song', year)[0:10].index.tolist(), sep='\n')
+        print(f"\n{year}", *analyzer.top_by_year('Song', year)[:10], sep='\n')
