@@ -50,7 +50,7 @@ class AnalyzerFM():
         # creating the dataframe to be used by the Analyzer
         self.df = pd.DataFrame({
             'Artist': [ scrobble['artist']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
-            'Song': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ], # TODO: change label to Track
+            'Track': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ], # TODO: change label to Track
             'Album': [ scrobble['album']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
@@ -62,16 +62,16 @@ class AnalyzerFM():
 
     @staticmethod
     def __top(df: pd.DataFrame, category: str) -> List[str]:
-        """Finds the top category (Artist, Song or Album) in the given dataframe and returns a list with them."""
+        """Finds the top category (Artist, Track or Album) in the given dataframe and returns a list with them."""
         return df[category].value_counts().index.tolist()
 
     
     def top_by_week(self, category: str, year: int, month: int, day: int) -> List[str]:
         """
-        Finds the top category (Artist, Song or Album) in the period of one week
+        Finds the top category (Artist, Track or Album) in the period of one week
 
         Parameters:
-            category: can be either 'Artist', 'Song' or 'Album'
+            category: can be either 'Artist', 'Track' or 'Album'
             year: disered year (YYYY)
             month: disered month (MM)
             day: disered day (DD)
@@ -87,10 +87,10 @@ class AnalyzerFM():
 
     def top_by_month(self, category: str, year: int, month: int) -> List[str]:
         """
-        Finds the top category (Artist, Song or Album) of a specif month of the given year
+        Finds the top category (Artist, Track or Album) of a specif month of the given year
 
         Parameters:
-            category: can be either 'Artist', 'Song' or 'Album'
+            category: can be either 'Artist', 'Track' or 'Album'
             year: disered year (YYYY)
             month: disered month (MM)
 
@@ -102,10 +102,10 @@ class AnalyzerFM():
 
     def top_by_year(self, category: str, year: int) -> List[str]:
         """
-        Finds the top category (Artist, Song or Album) of the whole year
+        Finds the top category (Artist, Track or Album) of the whole year
 
         Parameters:
-            category: can be either 'Artist', 'Song' or 'Album'
+            category: can be either 'Artist', 'Track' or 'Album'
             year: disered year (YYYY)
 
         Returns:
@@ -121,6 +121,6 @@ if __name__ == '__main__':
     #     print(f"\n2021-{month}", *analyzer.top_by_month('Artist', 2021, month)[0:10], sep='\n')
 
     # for year in [2018, 2019, 2020, 2021]:
-    #     print(f"\n{year}", *analyzer.top_by_year('Song', year)[:10], sep='\n')
+    #     print(f"\n{year}", *analyzer.top_by_year('Track', year)[:10], sep='\n')
 
-    print("\nLast week:", *analyzer.top_by_week('Song', 2021, 6, 3)[:5], sep='\n')
+    print("\nLast week:", *analyzer.top_by_week('Track', 2021, 6, 3)[:5], sep='\n')
