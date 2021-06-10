@@ -55,8 +55,9 @@ class AnalyzerFM():
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
 
-        # converting the Date column from string to datetime64
+        # converting the Date column from string to datetime64 and setting it as index
         self.df['Date'] = pd.to_datetime(self.df['Date'], format='%d %b %Y, %H:%M')
+        self.df.set_index('Date', inplace=True)
 
 
     @staticmethod
@@ -81,7 +82,7 @@ class AnalyzerFM():
         current_week = pd.Timestamp(f"{year}-{month}-{day+1}")
         last_week = current_week - pd.Timedelta(7, 'D')
 
-        return self.__top(self.df[ (self.df['Date'] >= last_week) & (self.df['Date'] < current_week) ], category)
+        return self.__top(self.df.loc[current_week:last_week], category)
 
 
     def top_by_month(self, category: str, year: int, month: int) -> List[str]:
@@ -96,7 +97,7 @@ class AnalyzerFM():
         Returns:
             A list with the top category for the given month
         """
-        return self.__top(self.df[ (self.df['Date'].dt.year == year) & (self.df['Date'].dt.month == month) ], category)
+        return self.__top(self.df.loc[f'{year}-{month}'], category)
 
 
     def top_by_year(self, category: str, year: int) -> List[str]:
@@ -110,14 +111,14 @@ class AnalyzerFM():
         Returns:
             A list with the top category for the given year
         """
-        return self.__top(self.df[ self.df['Date'].dt.year == year ], category)
+        return self.__top(self.df.loc[f'{year}'], category)
 
 
 
 if __name__ == '__main__':
     analyzer = AnalyzerFM('Vini_Bueno')
     # for month in range(1, 6):
-    #     print(f"\n2021-{month}", *analyzer.top_by_month('Album', 2021, month)[0:10].index.tolist(), sep='\n')
+    #     print(f"\n2021-{month}", *analyzer.top_by_month('Artist', 2021, month)[0:10], sep='\n')
 
     # for year in [2018, 2019, 2020, 2021]:
     #     print(f"\n{year}", *analyzer.top_by_year('Song', year)[:10], sep='\n')
