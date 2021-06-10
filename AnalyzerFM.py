@@ -54,12 +54,23 @@ class AnalyzerFM():
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
 
-    
-    def top_artists(self, start: int = 0, stop: int = -1) -> pd.DataFrame:
-        return self.df['Artist'].value_counts().iloc[start:stop]
+        # converting the Date column from string to datetime64
+        self.df['Date'] = pd.to_datetime(self.df['Date'], format='%d %b %Y, %H:%M')
+
+    @staticmethod
+    def top_artists(df: pd.DataFrame) -> pd.DataFrame:
+        return df['Artist'].value_counts()
+
+
+    @staticmethod
+    def by_month(df: pd.DataFrame, year: int, month: int) -> pd.DataFrame:
+        return df[ (df['Date'].dt.year == year) & (df['Date'].dt.month == month) ]
 
 
 if __name__ == '__main__':
     analyzer = AnalyzerFM('Vini_Bueno')
     # print(analyzer.df)
-    print(analyzer.top_artists(stop=20))
+    # print(analyzer.top_artists(stop=20))
+    for month in range(1, 6):
+        df = analyzer.by_month(analyzer.df, 2021, month)
+        print(f"\n2021-{month}\n", analyzer.top_artists(df)[0:10])
