@@ -67,8 +67,15 @@ class AnalyzerFM():
         return self.__top(self.df[ (self.df['Date'].dt.year == year) & (self.df['Date'].dt.month == month) ], category)
 
 
+    def top_by_year(self, category: str, year: int) -> pd.DataFrame:
+        return self.__top(self.df[ self.df['Date'].dt.year == year ], category)
+
+
 
 if __name__ == '__main__':
     analyzer = AnalyzerFM('Vini_Bueno')
-    for month in range(1, 6):
-        print(f"\n2021-{month}", *analyzer.top_by_month('Album', 2021, month)[0:10].index.tolist(), sep='\n')
+    # for month in range(1, 6):
+    #     print(f"\n2021-{month}", *analyzer.top_by_month('Album', 2021, month)[0:10].index.tolist(), sep='\n')
+
+    for year in [2018, 2019, 2020, 2021]:
+        print(f"\n{year}", *analyzer.top_by_year('Song', year)[0:10].index.tolist(), sep='\n')
