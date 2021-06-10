@@ -5,6 +5,7 @@ from datetime import date
 from sys import exit
 import requests_cache # type: ignore
 import pandas as pd # type: ignore
+import numpy as np
 
 class AnalyzerFM():
     """
@@ -50,7 +51,7 @@ class AnalyzerFM():
         # creating the dataframe to be used by the Analyzer
         self.df = pd.DataFrame({
             'Artist': [ scrobble['artist']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
-            'Track': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ], # TODO: change label to Track
+            'Track': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ],                  # TODO: change label to Track
             'Album': [ scrobble['album']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
@@ -63,7 +64,8 @@ class AnalyzerFM():
     @staticmethod
     def __top(df: pd.DataFrame, category: str) -> List[str]:
         """Finds the top category (Artist, Track or Album) in the given dataframe and returns a list with them."""
-        return df[category].value_counts().index.tolist()
+        raw = df[category].value_counts()       # ordered by frequency (value_counts) only
+        return raw.iloc[ np.lexsort([raw.index, -raw.values]) ].index.tolist()      # returning ordered by frequency (values) then by name (index)
 
     
     def top_by_week(self, category: str, year: int, month: int, day: int) -> List[str]:
