@@ -50,7 +50,7 @@ class AnalyzerFM():
         # creating the dataframe to be used by the Analyzer
         self.df = pd.DataFrame({
             'Artist': [ scrobble['artist']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
-            'Song': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ],
+            'Song': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ], # TODO: change label to Track
             'Album': [ scrobble['album']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
@@ -63,6 +63,25 @@ class AnalyzerFM():
     def __top(df: pd.DataFrame, category: str) -> List[str]:
         """Finds the top category (Artist, Song or Album) in the given dataframe and returns a list with them."""
         return df[category].value_counts().index.tolist()
+
+    
+    def top_by_week(self, category: str, year: int, month: int, day: int) -> List[str]:
+        """
+        Finds the top category (Artist, Song or Album) in the period of one week
+
+        Parameters:
+            category: can be either 'Artist', 'Song' or 'Album'
+            year: disered year (YYYY)
+            month: disered month (MM)
+            day: disered day (DD)
+
+        Returns:
+            A list with the top category for the period of one week
+        """
+        current_week = pd.Timestamp(f"{year}-{month}-{day+1}")
+        last_week = current_week - pd.Timedelta(7, 'D')
+
+        return self.__top(self.df[ (self.df['Date'] >= last_week) & (self.df['Date'] < current_week) ], category)
 
 
     def top_by_month(self, category: str, year: int, month: int) -> List[str]:
@@ -100,5 +119,7 @@ if __name__ == '__main__':
     # for month in range(1, 6):
     #     print(f"\n2021-{month}", *analyzer.top_by_month('Album', 2021, month)[0:10].index.tolist(), sep='\n')
 
-    for year in [2018, 2019, 2020, 2021]:
-        print(f"\n{year}", *analyzer.top_by_year('Song', year)[:10], sep='\n')
+    # for year in [2018, 2019, 2020, 2021]:
+    #     print(f"\n{year}", *analyzer.top_by_year('Song', year)[:10], sep='\n')
+
+    print("\nLast week:", *analyzer.top_by_week('Song', 2021, 6, 3)[:5], sep='\n')
