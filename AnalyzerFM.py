@@ -23,7 +23,7 @@ class AnalyzerFM():
         pages = []
         current_page = 1
 
-        requests_cache.install_cache('demo_cache')      # caching the get response in cache.sqlite for faster performance
+        requests_cache.install_cache('cached_request')      # caching the get request in cached_request.sqlite for faster performance
 
         # looping through all the response pages 
         while True:
@@ -51,7 +51,7 @@ class AnalyzerFM():
         # creating the dataframe to be used by the Analyzer
         self.df = pd.DataFrame({
             'Artist': [ scrobble['artist']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
-            'Track': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ],                  # TODO: change label to Track
+            'Track': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ],
             'Album': [ scrobble['album']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
@@ -74,9 +74,9 @@ class AnalyzerFM():
 
         Parameters:
             category: can be either 'Artist', 'Track' or 'Album'
-            year: disered year (YYYY)
-            month: disered month (MM)
-            day: disered day (DD)
+            year: desired year (YYYY)
+            month: desired month (MM)
+            day: desired day (DD)
 
         Returns:
             A list with the top category for the period of one week
@@ -93,8 +93,8 @@ class AnalyzerFM():
 
         Parameters:
             category: can be either 'Artist', 'Track' or 'Album'
-            year: disered year (YYYY)
-            month: disered month (MM)
+            year: desired year (YYYY)
+            month: desired month (MM)
 
         Returns:
             A list with the top category for the given month
@@ -108,7 +108,7 @@ class AnalyzerFM():
 
         Parameters:
             category: can be either 'Artist', 'Track' or 'Album'
-            year: disered year (YYYY)
+            year: desired year (YYYY)
 
         Returns:
             A list with the top category for the given year
