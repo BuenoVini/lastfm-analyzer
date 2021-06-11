@@ -51,8 +51,8 @@ class AnalyzerFM():
         # creating the dataframe to be used by the Analyzer
         self.df = pd.DataFrame({
             'Artist': [ scrobble['artist']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
-            'Track': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ],
             'Album': [ scrobble['album']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
+            'Track': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ],
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
 
@@ -61,39 +61,33 @@ class AnalyzerFM():
         self.df.set_index('Date', inplace=True)
 
 
+
     @staticmethod
     def __top(df: pd.DataFrame, category: str) -> pd.DataFrame:
-        """Finds the top category (Artist, Track or Album) in the given dataframe and returns a new dataframe with them."""
-        new_df = df.copy()
-        # TODO: instead of using switch-case, return a single multindexed dataframe with tracks count
-        if category == 'Track':
-            new_df['Count'] = new_df.groupby(['Track', 'Artist']).transform('count')
-            new_df = new_df.set_index('Count').drop_duplicates(['Track', 'Artist'])
+        """Finds the top category (Artist, Album or Track) in the given dataframe and returns a new dataframe with them."""
+        # creating a new dataframe with each track's frequency
+        counted_df = df.copy()
+        counted_df['Count'] = counted_df.groupby(by=['Artist', 'Track']).transform('count')
+        counted_df = counted_df.set_index(['Artist', 'Album', 'Track']).sort_index()
+        counted_df = counted_df[ ~counted_df.index.get_level_values('Track').duplicated() ]
 
-            # sorting by count, then artist and then by track
-            return new_df.iloc[ np.lexsort([new_df['Track'].str.upper(), new_df['Artist'].str.upper(), -new_df.index]) ]
+        if category == 'Track':
+            return counted_df.groupby(level=['Artist', 'Album', 'Track']).sum().sort_values('Count', ascending=False)
         
         elif category == 'Album':
-            new_df['Count'] = new_df.groupby(['Album', 'Artist']).transform('count')
-            new_df = new_df.set_index('Count').drop_duplicates(['Album', 'Artist']).drop('Track', axis='columns')
-
-            # sorting by count, then artist and then by album
-            return new_df.iloc[ np.lexsort([new_df['Album'].str.upper(), new_df['Artist'].str.upper(), -new_df.index]) ]
+            return counted_df.groupby(level=['Artist', 'Album']).sum().sort_values('Count', ascending=False)
 
         elif category == 'Artist':
-            new_df['Count'] = new_df.groupby('Artist').transform('count')['Album']
-            new_df = new_df.set_index('Count').drop_duplicates('Artist').drop(['Track', 'Album'], axis='columns')
-
-            # sorting by count and then by artist
-            return new_df.iloc[ np.lexsort([new_df['Artist'].str.upper(), -new_df.index]) ]
+            return counted_df.groupby(level='Artist').sum().sort_values('Count', ascending=False)
         
         else:
             raise KeyError(category)
 
-    
+
+
     def top_by_week(self, category: str, year: int, month: int, day: int) -> pd.DataFrame:
         """
-        Finds the top category (Artist, Track or Album) in the period of one week
+        Finds the top category (Artist, Album or Track) in the period of one week
 
         Parameters:
             category: can be either 'Artist', 'Track' or 'Album'
@@ -110,9 +104,10 @@ class AnalyzerFM():
         return self.__top(self.df.loc[current_week:last_week], category)
 
 
+
     def top_by_month(self, category: str, year: int, month: int) -> pd.DataFrame:
         """
-        Finds the top category (Artist, Track or Album) of a specif month of the given year
+        Finds the top category (Artist, Album or Track) of a specif month of the given year
 
         Parameters:
             category: can be either 'Artist', 'Track' or 'Album'
@@ -125,9 +120,10 @@ class AnalyzerFM():
         return self.__top(self.df.loc[f'{year}-{month}'], category)
 
 
+
     def top_by_year(self, category: str, year: int) -> pd.DataFrame:
         """
-        Finds the top category (Artist, Track or Album) of the whole year
+        Finds the top category (Artist, Album or Track) of the whole year
 
         Parameters:
             category: can be either 'Artist', 'Track' or 'Album'
@@ -137,6 +133,7 @@ class AnalyzerFM():
             A list with the top category for the given year
         """
         return self.__top(self.df.loc[f'{year}'], category)
+
 
 
 
