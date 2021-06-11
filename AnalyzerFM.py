@@ -62,13 +62,36 @@ class AnalyzerFM():
 
 
     @staticmethod
-    def __top(df: pd.DataFrame, category: str) -> List[str]:
-        """Finds the top category (Artist, Track or Album) in the given dataframe and returns a list with them."""
-        raw = df[category].value_counts()       # ordered by frequency (value_counts) only
-        return raw.iloc[ np.lexsort([raw.index, -raw.values]) ].index.tolist()      # returning ordered by frequency (values) then by name (index)
+    def __top(df: pd.DataFrame, category: str) -> pd.DataFrame:
+        """Finds the top category (Artist, Track or Album) in the given dataframe and returns a new dataframe with them."""
+        new_df = df.copy()
+        # TODO: instead of using switch-case, return a single multindexed dataframe with tracks count
+        if category == 'Track':
+            new_df['Count'] = new_df.groupby(['Track', 'Artist']).transform('count')
+            new_df = new_df.set_index('Count').drop_duplicates(['Track', 'Artist'])
+
+            # sorting by count, then artist and then by track
+            return new_df.iloc[ np.lexsort([new_df['Track'].str.upper(), new_df['Artist'].str.upper(), -new_df.index]) ]
+        
+        elif category == 'Album':
+            new_df['Count'] = new_df.groupby(['Album', 'Artist']).transform('count')
+            new_df = new_df.set_index('Count').drop_duplicates(['Album', 'Artist']).drop('Track', axis='columns')
+
+            # sorting by count, then artist and then by album
+            return new_df.iloc[ np.lexsort([new_df['Album'].str.upper(), new_df['Artist'].str.upper(), -new_df.index]) ]
+
+        elif category == 'Artist':
+            new_df['Count'] = new_df.groupby('Artist').transform('count')['Album']
+            new_df = new_df.set_index('Count').drop_duplicates('Artist').drop(['Track', 'Album'], axis='columns')
+
+            # sorting by count and then by artist
+            return new_df.iloc[ np.lexsort([new_df['Artist'].str.upper(), -new_df.index]) ]
+        
+        else:
+            raise KeyError(category)
 
     
-    def top_by_week(self, category: str, year: int, month: int, day: int) -> List[str]:
+    def top_by_week(self, category: str, year: int, month: int, day: int) -> pd.DataFrame:
         """
         Finds the top category (Artist, Track or Album) in the period of one week
 
@@ -87,7 +110,7 @@ class AnalyzerFM():
         return self.__top(self.df.loc[current_week:last_week], category)
 
 
-    def top_by_month(self, category: str, year: int, month: int) -> List[str]:
+    def top_by_month(self, category: str, year: int, month: int) -> pd.DataFrame:
         """
         Finds the top category (Artist, Track or Album) of a specif month of the given year
 
@@ -102,7 +125,7 @@ class AnalyzerFM():
         return self.__top(self.df.loc[f'{year}-{month}'], category)
 
 
-    def top_by_year(self, category: str, year: int) -> List[str]:
+    def top_by_year(self, category: str, year: int) -> pd.DataFrame:
         """
         Finds the top category (Artist, Track or Album) of the whole year
 
@@ -120,9 +143,9 @@ class AnalyzerFM():
 if __name__ == '__main__':
     analyzer = AnalyzerFM('Vini_Bueno')
     # for month in range(1, 6):
-    #     print(f"\n2021-{month}", *analyzer.top_by_month('Artist', 2021, month)[0:10], sep='\n')
+    #     print(f"\n2021-{month}", analyzer.top_by_month('Artist', 2021, month)[0:10], sep='\n')
 
-    # for year in [2018, 2019, 2020, 2021]:
-    #     print(f"\n{year}", *analyzer.top_by_year('Track', year)[:10], sep='\n')
+    for year in [2018, 2019, 2020, 2021]:
+        print(f"\n{year}", analyzer.top_by_year('Track', year).head(), sep='\n')
 
-    print("\nLast week:", *analyzer.top_by_week('Track', 2021, 6, 3)[:5], sep='\n')
+    # print("\nLast week:", analyzer.top_by_week('Track', 2021, 6, 3).head(), sep='\n')
