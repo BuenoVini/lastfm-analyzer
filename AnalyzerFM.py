@@ -12,7 +12,7 @@ class AnalyzerFM():
     An analyzer for the user's data fetched from Last.fm.
 
     Public instance variables:
-        df: dataframe with all scrobbles information of that user.
+        df: Dataframe with all scrobbles information of that user.
 
     Public methods:
         None.
@@ -63,7 +63,7 @@ class AnalyzerFM():
 
     @staticmethod
     def __top(df: pd.DataFrame, category: str) -> pd.DataFrame:
-        """Finds the top category (Artist, Track or Album) in the given dataframe and returns a new dataframe with them."""
+        """Finds the top category (how many times an Artist, Track or Album was scrobbled) in the given dataframe and returns a new dataframe with them."""
         new_df = df.copy()
         if category == 'Track':
             new_df['Count'] = new_df.groupby(['Track', 'Artist']).transform('count')
@@ -90,26 +90,75 @@ class AnalyzerFM():
             raise KeyError(category)
 
 
-    def highlights_week(self, date: str) -> Dict[str,  int]:
-        total_scrobbles = self.top_by_week('Track', date).index.values.sum()
+    def highlights_week(self, date: str) -> Dict[str, Dict[str, int]]:
+        """
+        Counts stats like the total and average daily scrobbles, total artists and albums of the current and last week.
+
+        Paramaters:
+            date: Desired date (YYYY-MM-DD).
+
+        Returns:
+            A dictionary with:
+            {
+                'Current Week': {
+                    'Artists': int
+                    'Albums': int
+                    'Tracks': int
+                    'Scrobbles': int
+                    'Avarage Daily': int
+                },
+
+                'Last Week': {
+                    'Artists': int
+                    'Albums': int
+                    'Tracks': int
+                    'Scrobbles': int
+                    'Avarage Daily': int
+                }
+            }
+        """
+        scrobbles_cur_week = self.top_by_week('Track', date).index.values.sum()
+        tracks_cur_week = self.top_by_week('Track', date).value_counts('Track').sum()
+        albums_cur_week = self.top_by_week('Album', date).value_counts('Album').sum()
+        artists_cur_week = self.top_by_week('Artist', date).value_counts('Artist').sum()
+
+        last_week = pd.Timestamp(date) - pd.Timedelta(7, 'D')
+
+        scrobbles_last_week = self.top_by_week('Track', last_week).index.values.sum()
+        tracks_last_week = self.top_by_week('Track', last_week).value_counts('Track').sum()
+        albums_last_week = self.top_by_week('Album', last_week).value_counts('Album').sum()
+        artists_last_week = self.top_by_week('Artist', last_week).value_counts('Artist').sum()
 
         return {
-            'Total Scrobbles': total_scrobbles,
-            'Avarage Daily': round(total_scrobbles / 7)
+            'Current Week': {
+                'Artists': artists_cur_week,
+                'Albums': albums_cur_week,
+                'Tracks': tracks_cur_week,
+                'Scrobbles': scrobbles_cur_week,
+                'Avarage Daily': round(scrobbles_cur_week / 7),
+            },
+
+            'Last Week': {
+                'Artists': artists_last_week,
+                'Albums': albums_last_week,
+                'Tracks': tracks_last_week,
+                'Scrobbles': scrobbles_last_week,
+                'Avarage Daily': round(scrobbles_last_week / 7)
+            }
         }
 
     
     def top_by_week(self, category: str, date: str) -> pd.DataFrame:
         """
         Finds the top category (Artist, Track or Album) in the period of one week.
-        NOTE: the day passed as parameter is open-ended, meaning that this day is not taken into account.
+        NOTE: The day passed as parameter is open-ended, meaning that this day is not taken into account.
 
         Parameters:
-            category: can be either 'Artist', 'Album' or 'Track'
-            date: desired date (YYYY-MM-DD)
+            category: Can be either 'Artist', 'Album' or 'Track'.
+            date: Desired date (YYYY-MM-DD).
 
         Returns:
-            A list with the top category for the period of one week
+            A list with the top category for the period of one week.
         """
         current_week = pd.Timestamp(date)
         last_week = current_week - pd.Timedelta(7, 'D')
@@ -119,28 +168,28 @@ class AnalyzerFM():
 
     def top_by_month(self, category: str, year_month: str) -> pd.DataFrame:
         """
-        Finds the top category (Artist, Track or Album) of a specif month of the given year
+        Finds the top category (Artist, Track or Album) of a specif month of the given year.
 
         Parameters:
-            category: can be either 'Artist', 'Album' or 'Track'
-            year_month: desired date (YYYY-MM)
+            category: Can be either 'Artist', 'Album' or 'Track'.
+            year_month: Desired date (YYYY-MM).
 
         Returns:
-            A list with the top category for the given month
+            A list with the top category for the given month.
         """
         return self.__top(self.df.loc[year_month], category)
 
 
     def top_by_year(self, category: str, year: str) -> pd.DataFrame:
         """
-        Finds the top category (Artist, Track or Album) of the whole year
+        Finds the top category (Artist, Track or Album) of the whole year.
 
         Parameters:
-            category: can be either 'Artist', 'Album' or 'Track'
-            year: desired year (YYYY)
+            category: Can be either 'Artist', 'Album' or 'Track'.
+            year: Desired year (YYYY).
 
         Returns:
-            A list with the top category for the given year
+            A list with the top category for the given year.
         """
         return self.__top(self.df.loc[year], category)
 
@@ -152,6 +201,6 @@ if __name__ == '__main__':
     #     print(f"\n2021-{month}", analyzer.top_by_month('Artist', 2021, month)[0:10], sep='\n')
 
     for year in [2018, 2019, 2020, 2021]:
-        print(f"\n{year}", analyzer.top_by_year('Track', year).head(), sep='\n')
+        print(f"\n{year}", analyzer.top_by_year('Track', str(year)).head(), sep='\n')
 
     # print("\nLast week:", analyzer.top_by_week('Track', 2021, 6, 3).head(), sep='\n')
