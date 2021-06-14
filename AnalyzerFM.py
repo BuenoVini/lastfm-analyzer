@@ -60,14 +60,15 @@ class AnalyzerFM():
         self.df['Date'] = pd.to_datetime(self.df['Date'], format='%d %b %Y, %H:%M')
         self.df.set_index('Date', inplace=True)
 
-        # filling empty cells with np.nan
-        self.df.replace('', np.nan, inplace=True)
+        # empty albums cells means that the song was listened in the Last.fm Web Player
+        self.df['Album'] = self.df['Album'].replace('', 'Last.fm Web Player')
 
 
     @staticmethod
     def __top(df: pd.DataFrame, category: str) -> pd.DataFrame:
         """Finds the top category (how many times an Artist, Track or Album was scrobbled) in the given dataframe and returns a new dataframe with them."""
         new_df = df.copy()
+
         if category == 'Track':
             new_df['Count'] = new_df.groupby(['Track', 'Artist']).transform('count')
             new_df = new_df.set_index('Count').drop_duplicates(['Track', 'Artist'])
@@ -76,10 +77,10 @@ class AnalyzerFM():
             return new_df.iloc[ np.lexsort([new_df['Track'].str.upper(), new_df['Artist'].str.upper(), -new_df.index]) ]
         
         elif category == 'Album':
+            new_df = new_df[ ~(new_df['Album'] == 'Last.fm Web Player') ]     # dropping the songs that were listened in Last.fm Web Player
+            
             new_df['Count'] = new_df.groupby(['Album', 'Artist']).transform('count')
             new_df = new_df.set_index('Count').drop_duplicates(['Album', 'Artist']).drop('Track', axis='columns')
-
-            new_df.dropna(subset=['Album'], inplace=True)     # dropping missing albums (i.e., those songs that were listened in Last.fm Web Player)
 
             # sorting by count, then artist and then by album
             return new_df.iloc[ np.lexsort([new_df['Album'].str.upper(), new_df['Artist'].str.upper(), -new_df.index]) ]
