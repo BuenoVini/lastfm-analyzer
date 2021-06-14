@@ -60,6 +60,9 @@ class AnalyzerFM():
         self.df['Date'] = pd.to_datetime(self.df['Date'], format='%d %b %Y, %H:%M')
         self.df.set_index('Date', inplace=True)
 
+        # filling empty cells with np.nan
+        self.df.replace('', np.nan, inplace=True)
+
 
     @staticmethod
     def __top(df: pd.DataFrame, category: str) -> pd.DataFrame:
@@ -75,6 +78,8 @@ class AnalyzerFM():
         elif category == 'Album':
             new_df['Count'] = new_df.groupby(['Album', 'Artist']).transform('count')
             new_df = new_df.set_index('Count').drop_duplicates(['Album', 'Artist']).drop('Track', axis='columns')
+
+            new_df.dropna(subset=['Album'], inplace=True)     # dropping missing albums (i.e., those songs that were listened in Last.fm Web Player)
 
             # sorting by count, then artist and then by album
             return new_df.iloc[ np.lexsort([new_df['Album'].str.upper(), new_df['Artist'].str.upper(), -new_df.index]) ]
