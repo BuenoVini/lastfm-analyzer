@@ -34,16 +34,16 @@ class AnalyzerFM():
                 print(response.text)
                 exit(1)
             
+            # verifying if the response came from the server (and not from the cache)
+            if not getattr(response, 'from_cache', False):
+                print(response.status_code, current_page, response.json()['recenttracks']['@attr']['totalPages'])
+                sleep(0.25)
+
             # append current response to pages
             pages.append(response.json())
 
             # verifying if the current page does not exceed the max page number... if it does (last one), break the loop
             if current_page < int(response.json()['recenttracks']['@attr']['totalPages']):
-                # verifying if the response came from the server (and not from the cache)
-                if not getattr(response, 'from_cache', False):
-                    print(response.status_code, current_page, response.json()['recenttracks']['@attr']['totalPages'])
-                    sleep(0.25)
-                
                 current_page += 1
             else:
                 break
