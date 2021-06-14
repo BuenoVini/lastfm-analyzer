@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict
 from time import sleep
 from LastFM import LastFM
 from datetime import date
@@ -51,8 +51,8 @@ class AnalyzerFM():
         # creating the dataframe to be used by the Analyzer
         self.df = pd.DataFrame({
             'Artist': [ scrobble['artist']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
-            'Track': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ],
             'Album': [ scrobble['album']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ],
+            'Track': [ scrobble['name'] for page in pages for scrobble in page['recenttracks']['track'] ],
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
 
@@ -65,7 +65,6 @@ class AnalyzerFM():
     def __top(df: pd.DataFrame, category: str) -> pd.DataFrame:
         """Finds the top category (Artist, Track or Album) in the given dataframe and returns a new dataframe with them."""
         new_df = df.copy()
-        # TODO: instead of using switch-case, return a single multindexed dataframe with tracks count
         if category == 'Track':
             new_df['Count'] = new_df.groupby(['Track', 'Artist']).transform('count')
             new_df = new_df.set_index('Count').drop_duplicates(['Track', 'Artist'])
@@ -90,10 +89,20 @@ class AnalyzerFM():
         else:
             raise KeyError(category)
 
+
+    def highlights_week(self, year: int, month: int, day: int) -> Dict[str,  int]:
+        total_scrobbles = self.top_by_week('Track', year, month , day).index.values.sum()
+
+        return {
+            'Total Scrobbles': total_scrobbles,
+            'Avarage Daily': round(total_scrobbles / 7)
+        }
+
     
     def top_by_week(self, category: str, year: int, month: int, day: int) -> pd.DataFrame:
         """
-        Finds the top category (Artist, Track or Album) in the period of one week
+        Finds the top category (Artist, Track or Album) in the period of one week.
+        NOTE: the day passed as parameter is open-ended, meaning that this day is not taken into account.
 
         Parameters:
             category: can be either 'Artist', 'Track' or 'Album'
@@ -104,7 +113,7 @@ class AnalyzerFM():
         Returns:
             A list with the top category for the period of one week
         """
-        current_week = pd.Timestamp(f"{year}-{month}-{day+1}")
+        current_week = pd.Timestamp(f"{year}-{month}-{day}")
         last_week = current_week - pd.Timedelta(7, 'D')
 
         return self.__top(self.df.loc[current_week:last_week], category)
