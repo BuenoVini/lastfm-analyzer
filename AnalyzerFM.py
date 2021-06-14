@@ -90,8 +90,8 @@ class AnalyzerFM():
             raise KeyError(category)
 
 
-    def highlights_week(self, year: int, month: int, day: int) -> Dict[str,  int]:
-        total_scrobbles = self.top_by_week('Track', year, month , day).index.values.sum()
+    def highlights_week(self, date: str) -> Dict[str,  int]:
+        total_scrobbles = self.top_by_week('Track', date).index.values.sum()
 
         return {
             'Total Scrobbles': total_scrobbles,
@@ -99,53 +99,50 @@ class AnalyzerFM():
         }
 
     
-    def top_by_week(self, category: str, year: int, month: int, day: int) -> pd.DataFrame:
+    def top_by_week(self, category: str, date: str) -> pd.DataFrame:
         """
         Finds the top category (Artist, Track or Album) in the period of one week.
         NOTE: the day passed as parameter is open-ended, meaning that this day is not taken into account.
 
         Parameters:
-            category: can be either 'Artist', 'Track' or 'Album'
-            year: desired year (YYYY)
-            month: desired month (MM)
-            day: desired day (DD)
+            category: can be either 'Artist', 'Album' or 'Track'
+            date: desired date (YYYY-MM-DD)
 
         Returns:
             A list with the top category for the period of one week
         """
-        current_week = pd.Timestamp(f"{year}-{month}-{day}")
+        current_week = pd.Timestamp(date)
         last_week = current_week - pd.Timedelta(7, 'D')
 
         return self.__top(self.df.loc[current_week:last_week], category)
 
 
-    def top_by_month(self, category: str, year: int, month: int) -> pd.DataFrame:
+    def top_by_month(self, category: str, year_month: str) -> pd.DataFrame:
         """
         Finds the top category (Artist, Track or Album) of a specif month of the given year
 
         Parameters:
-            category: can be either 'Artist', 'Track' or 'Album'
-            year: desired year (YYYY)
-            month: desired month (MM)
+            category: can be either 'Artist', 'Album' or 'Track'
+            year_month: desired date (YYYY-MM)
 
         Returns:
             A list with the top category for the given month
         """
-        return self.__top(self.df.loc[f'{year}-{month}'], category)
+        return self.__top(self.df.loc[year_month], category)
 
 
-    def top_by_year(self, category: str, year: int) -> pd.DataFrame:
+    def top_by_year(self, category: str, year: str) -> pd.DataFrame:
         """
         Finds the top category (Artist, Track or Album) of the whole year
 
         Parameters:
-            category: can be either 'Artist', 'Track' or 'Album'
+            category: can be either 'Artist', 'Album' or 'Track'
             year: desired year (YYYY)
 
         Returns:
             A list with the top category for the given year
         """
-        return self.__top(self.df.loc[f'{year}'], category)
+        return self.__top(self.df.loc[year], category)
 
 
 
