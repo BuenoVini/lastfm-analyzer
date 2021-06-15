@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Tuple
 import pandas as pd # type: ignore
 # from AnalyzerFM import AnalyzerFM
 
@@ -23,6 +24,10 @@ class HighlighterFM:
     percentage_tracks: int
     percentage_scrobbles: int
     percentage_average_daily: int
+
+    top_artist: Tuple[str, int]
+    top_album: Tuple[str, int]
+    top_track: Tuple[str, int]
 
 
     def __init__(self, period: str, df_artists_cur: pd.DataFrame, df_albums_cur: pd.DataFrame, df_tracks_cur: pd.DataFrame, df_artists_last: pd.DataFrame, df_albums_last: pd.DataFrame, df_tracks_last: pd.DataFrame) -> None:
@@ -49,6 +54,10 @@ class HighlighterFM:
         object.__setattr__(self, 'percentage_scrobbles', self.__percentage(self.scrobbles_cur, self.scrobbles_last))
         object.__setattr__(self, 'percentage_average_daily', self.__percentage(self.average_daily_cur, self.average_daily_last))
 
+        object.__setattr__(self, 'top_artist', self.__top(df_artists_cur, 'Artist'))
+        object.__setattr__(self, 'top_album', self.__top(df_albums_cur, 'Album'))
+        object.__setattr__(self, 'top_track', self.__top(df_tracks_cur, 'Track'))
+
     
     def __str__(self) -> str:
         return f"""
@@ -72,6 +81,11 @@ class HighlighterFM:
         Total Tracks listened: {self.percentage_tracks}%
         Total Scrobbles: {self.percentage_scrobbles}%
         Average Daily: {self.percentage_average_daily}%
+
+        --Top listened--
+        Artist: {self.top_artist[0]} with {self.top_artist[1]} scrobbles
+        Album: {self.top_album[0]} with {self.top_album[1]} scrobbles
+        Track: {self.top_track[0]} with {self.top_track[1]} scrobbles
         """
 
 
@@ -88,3 +102,8 @@ class HighlighterFM:
     @staticmethod
     def __percentage(current: int, last: int) -> int:
         return round( ((current / last) - 1) * 100 )
+
+    
+    @staticmethod
+    def __top(df: pd.DataFrame, category: str) -> Tuple[str, int]:
+        return ( df.iloc[0][category], df.index[0] )
