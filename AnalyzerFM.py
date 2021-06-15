@@ -99,7 +99,7 @@ class AnalyzerFM():
 
     def highlights_week(self, week: str) -> HighlighterFM:
         """
-        Counts stats like the total and average daily scrobbles, total artists and albums of the current and last week.
+        Counts stats like the total and average daily scrobbles, total artists and albums of the current and previous week.
 
         Paramaters:
             week: Desired week (YYYY-MM-DD).
@@ -118,7 +118,56 @@ class AnalyzerFM():
 
             df_artists_last=self.top_by_week('Artist', last_week),
             df_albums_last=self.top_by_week('Album', last_week),
-            df_tracks_last=self.top_by_week('Track', last_week),
+            df_tracks_last=self.top_by_week('Track', last_week)
+        )
+
+    
+    def highlights_month(self, year_month: str) -> HighlighterFM:
+        """
+        Counts stats like the total and average daily scrobbles, total artists and albums of the current and previous month.
+
+        Paramaters:
+            month: Desired month (YYYY-MM).
+
+        Returns:
+            A HighlighterFm object with the month's highlights
+        """
+        last_month = pd.Timestamp(year_month) - pd.Timedelta(4, 'W')
+
+        return HighlighterFM(
+            period='month',
+
+            df_artists_cur=self.top_by_month('Artist', year_month),
+            df_albums_cur=self.top_by_month('Album', year_month),
+            df_tracks_cur=self.top_by_month('Track', year_month),
+
+            df_artists_last=self.top_by_month('Artist', f"{last_month.year}-{last_month.month}"),
+            df_albums_last=self.top_by_month('Album', f"{last_month.year}-{last_month.month}"),
+            df_tracks_last=self.top_by_month('Track', f"{last_month.year}-{last_month.month}")
+        )
+
+    def highlights_year(self, year: str) -> HighlighterFM:
+        """
+        Counts stats like the total and average daily scrobbles, total artists and albums of the current and previous year.
+
+        Paramaters:
+            year: Desired year (YYYY).
+
+        Returns:
+            A HighlighterFm object with the year's highlights
+        """
+        last_year = str( int(year) - 1 )
+
+        return HighlighterFM(
+            period='year',
+
+            df_artists_cur=self.top_by_year('Artist', year),
+            df_albums_cur=self.top_by_year('Album', year),
+            df_tracks_cur=self.top_by_year('Track', year),
+
+            df_artists_last=self.top_by_year('Artist', last_year),
+            df_albums_last=self.top_by_year('Album', last_year),
+            df_tracks_last=self.top_by_year('Track', last_year)
         )
 
     
