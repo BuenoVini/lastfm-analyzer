@@ -40,13 +40,14 @@ class HighlighterFM:
         object.__setattr__(self, 'albums_cur', self.__unique(df_albums_cur, 'Album'))
         object.__setattr__(self, 'tracks_cur', self.__unique(df_tracks_cur, 'Track'))
         object.__setattr__(self, 'scrobbles_cur', self.__total(df_tracks_cur))
-        object.__setattr__(self, 'average_daily_cur', round(self.scrobbles_cur / 7))
+        period_map = {'year': 365, 'month': 30, 'week': 7}
+        object.__setattr__(self, 'average_daily_cur', round(self.scrobbles_cur / period_map[period]))
 
         object.__setattr__(self, 'artists_last', self.__unique(df_artists_last, 'Artist'))
         object.__setattr__(self, 'albums_last', self.__unique(df_albums_last, 'Album'))
         object.__setattr__(self, 'tracks_last', self.__unique(df_tracks_last, 'Track'))
         object.__setattr__(self, 'scrobbles_last', self.__total(df_tracks_last))
-        object.__setattr__(self, 'average_daily_last', round(self.scrobbles_last / 7))
+        object.__setattr__(self, 'average_daily_last', round(self.scrobbles_last / period_map[period]))
 
         object.__setattr__(self, 'percentage_artists', self.__percentage(self.artists_cur,self.artists_last))        
         object.__setattr__(self, 'percentage_albums', self.__percentage(self.albums_cur,self.albums_last))
@@ -106,4 +107,4 @@ class HighlighterFM:
     
     @staticmethod
     def __top(df: pd.DataFrame, category: str) -> Tuple[str, int]:
-        return ( df.iloc[0][category], df.index[0] )
+        return ( df.iloc[0][category], df.index[0] )    # TODO: return a Series to keep the row's info
