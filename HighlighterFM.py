@@ -34,7 +34,7 @@ class HighlighterFM:
         if period in 'year month week'.split():
             object.__setattr__(self, 'period', period)
         else:
-            raise RuntimeError(f"period should be: 'year', 'month' or 'week', but '{period}' was passed.")
+            raise ValueError(f"period should be: 'year', 'month' or 'week', but '{period}' was passed.")
 
         object.__setattr__(self, 'artists_cur', self.__unique(df_artists_cur, 'Artist'))
         object.__setattr__(self, 'albums_cur', self.__unique(df_albums_cur, 'Album'))
