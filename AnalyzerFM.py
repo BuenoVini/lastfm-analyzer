@@ -110,6 +110,8 @@ class AnalyzerFM():
         last_week = pd.Timestamp(week) - pd.Timedelta(7, 'D')
 
         return HighlighterFM(
+            period='week',
+
             df_artists_cur=self.top_by_week('Artist', week),
             df_albums_cur=self.top_by_week('Album', week),
             df_tracks_cur=self.top_by_week('Track', week),

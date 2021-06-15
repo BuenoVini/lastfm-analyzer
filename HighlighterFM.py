@@ -4,6 +4,8 @@ import pandas as pd # type: ignore
 
 @dataclass(init=False, frozen=True)
 class HighlighterFM:
+    period: str
+
     artists_cur: int
     albums_cur: int
     tracks_cur: int
@@ -22,10 +24,13 @@ class HighlighterFM:
     percentage_scrobbles: int
     percentage_average_daily: int
 
-    # state: str
 
+    def __init__(self, period: str, df_artists_cur: pd.DataFrame, df_albums_cur: pd.DataFrame, df_tracks_cur: pd.DataFrame, df_artists_last: pd.DataFrame, df_albums_last: pd.DataFrame, df_tracks_last: pd.DataFrame) -> None:
+        if period in 'year month week'.split():
+            object.__setattr__(self, 'period', period)
+        else:
+            raise RuntimeError(f"period should be: 'year', 'month' or 'week', but '{period}' was passed.")
 
-    def __init__(self, df_artists_cur: pd.DataFrame, df_albums_cur: pd.DataFrame, df_tracks_cur: pd.DataFrame, df_artists_last: pd.DataFrame, df_albums_last: pd.DataFrame, df_tracks_last: pd.DataFrame) -> None:
         object.__setattr__(self, 'artists_cur', self.__unique(df_artists_cur, 'Artist'))
         object.__setattr__(self, 'albums_cur', self.__unique(df_albums_cur, 'Album'))
         object.__setattr__(self, 'tracks_cur', self.__unique(df_tracks_cur, 'Track'))
@@ -44,28 +49,29 @@ class HighlighterFM:
         object.__setattr__(self, 'percentage_scrobbles', self.__percentage(self.scrobbles_cur, self.scrobbles_last))
         object.__setattr__(self, 'percentage_average_daily', self.__percentage(self.average_daily_cur, self.average_daily_last))
 
-        # object.__setattr__(self, 'state', state)
-
     
     def __str__(self) -> str:
         return f"""
-        Current Artists listened: {self.artists_cur},
-        Current Albums listened: {self.albums_cur},
-        Current Tracks listened: {self.tracks_cur},
-        Current Scrobbles: {self.scrobbles_cur},
-        Current Average Daily: {self.average_daily_cur}
+        --Current {self.period}--
+        Total Artists listened: {self.artists_cur}
+        Total Albums listened: {self.albums_cur}
+        Total Tracks listened: {self.tracks_cur}
+        Total Scrobbles: {self.scrobbles_cur}
+        Average Daily: {self.average_daily_cur}
         
-        Last time Artists listened: {self.artists_last},
-        Last time Albums listened: {self.albums_last},
-        Last time Tracks listened: {self.tracks_last},
-        Last time Scrobbles: {self.scrobbles_last},
-        Last time Average Daily: {self.average_daily_last}
+        --Previous {self.period}--
+        Total Artists listened: {self.artists_last}
+        Total Albums listened: {self.albums_last}
+        Total Tracks listened: {self.tracks_last}
+        Total Scrobbles: {self.scrobbles_last}
+        Average Daily: {self.average_daily_last}
         
-        Total Artists compared to last time: {self.percentage_artists}%,
-        Total Albums compared to last time: {self.percentage_albums}%,
-        Total Tracks compared to last time: {self.percentage_tracks}%,
-        Total Scrobbles compared to last time: {self.percentage_scrobbles}%,
-        Average Daily compared to last time: {self.percentage_average_daily}%,
+        --Statistics vs. previous {self.period}--
+        Total Artists listened: {self.percentage_artists}%
+        Total Albums listened: {self.percentage_albums}%
+        Total Tracks listened: {self.percentage_tracks}%
+        Total Scrobbles: {self.percentage_scrobbles}%
+        Average Daily: {self.percentage_average_daily}%
         """
 
 
