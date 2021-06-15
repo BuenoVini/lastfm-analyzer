@@ -1,3 +1,4 @@
+from HighlighterFM import HighlighterFM
 from typing import Dict
 from time import sleep
 from LastFM import LastFM
@@ -96,62 +97,27 @@ class AnalyzerFM():
             raise KeyError(category)
 
 
-    def highlights_week(self, date: str) -> Dict[str, Dict[str, int]]:
+    def highlights_week(self, week: str) -> HighlighterFM:
         """
         Counts stats like the total and average daily scrobbles, total artists and albums of the current and last week.
 
         Paramaters:
-            date: Desired date (YYYY-MM-DD).
+            week: Desired week (YYYY-MM-DD).
 
         Returns:
-            A dictionary with:
-            {
-                'Current Week': {
-                    'Artists': int
-                    'Albums': int
-                    'Tracks': int
-                    'Scrobbles': int
-                    'Avarage Daily': int
-                },
-
-                'Last Week': {
-                    'Artists': int
-                    'Albums': int
-                    'Tracks': int
-                    'Scrobbles': int
-                    'Avarage Daily': int
-                }
-            }
+            A HighlighterFm object with the week's highlights
         """
-        scrobbles_cur_week = self.top_by_week('Track', date).index.values.sum()
-        tracks_cur_week = self.top_by_week('Track', date).value_counts('Track').sum()
-        albums_cur_week = self.top_by_week('Album', date).value_counts('Album').sum()
-        artists_cur_week = self.top_by_week('Artist', date).value_counts('Artist').sum()
+        last_week = pd.Timestamp(week) - pd.Timedelta(7, 'D')
 
-        last_week = pd.Timestamp(date) - pd.Timedelta(7, 'D')
+        return HighlighterFM(
+            df_artists_cur=self.top_by_week('Artist', week),
+            df_albums_cur=self.top_by_week('Album', week),
+            df_tracks_cur=self.top_by_week('Track', week),
 
-        scrobbles_last_week = self.top_by_week('Track', last_week).index.values.sum()
-        tracks_last_week = self.top_by_week('Track', last_week).value_counts('Track').sum()
-        albums_last_week = self.top_by_week('Album', last_week).value_counts('Album').sum()
-        artists_last_week = self.top_by_week('Artist', last_week).value_counts('Artist').sum()
-
-        return {
-            'Current Week': {
-                'Artists': artists_cur_week,
-                'Albums': albums_cur_week,
-                'Tracks': tracks_cur_week,
-                'Scrobbles': scrobbles_cur_week,
-                'Avarage Daily': round(scrobbles_cur_week / 7),
-            },
-
-            'Last Week': {
-                'Artists': artists_last_week,
-                'Albums': albums_last_week,
-                'Tracks': tracks_last_week,
-                'Scrobbles': scrobbles_last_week,
-                'Avarage Daily': round(scrobbles_last_week / 7)
-            }
-        }
+            df_artists_last=self.top_by_week('Artist', last_week),
+            df_albums_last=self.top_by_week('Album', last_week),
+            df_tracks_last=self.top_by_week('Track', last_week),
+        )
 
     
     def top_by_week(self, category: str, date: str) -> pd.DataFrame:
