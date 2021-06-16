@@ -1,3 +1,4 @@
+from HighlighterFM import HighlighterFM
 from typing import Dict
 from time import sleep
 from LastFM import LastFM
@@ -96,62 +97,78 @@ class AnalyzerFM():
             raise KeyError(category)
 
 
-    def highlights_week(self, date: str) -> Dict[str, Dict[str, int]]:
+    def highlights_week(self, week: str) -> HighlighterFM:
         """
-        Counts stats like the total and average daily scrobbles, total artists and albums of the current and last week.
+        Counts stats like the total and average daily scrobbles, total artists and albums of the current and previous week.
 
         Paramaters:
-            date: Desired date (YYYY-MM-DD).
+            week: Desired week (YYYY-MM-DD).
 
         Returns:
-            A dictionary with:
-            {
-                'Current Week': {
-                    'Artists': int
-                    'Albums': int
-                    'Tracks': int
-                    'Scrobbles': int
-                    'Avarage Daily': int
-                },
-
-                'Last Week': {
-                    'Artists': int
-                    'Albums': int
-                    'Tracks': int
-                    'Scrobbles': int
-                    'Avarage Daily': int
-                }
-            }
+            A HighlighterFm object with the week's highlights
         """
-        scrobbles_cur_week = self.top_by_week('Track', date).index.values.sum()
-        tracks_cur_week = self.top_by_week('Track', date).value_counts('Track').sum()
-        albums_cur_week = self.top_by_week('Album', date).value_counts('Album').sum()
-        artists_cur_week = self.top_by_week('Artist', date).value_counts('Artist').sum()
+        last_week = pd.Timestamp(week) - pd.Timedelta(7, 'D')
 
-        last_week = pd.Timestamp(date) - pd.Timedelta(7, 'D')
+        return HighlighterFM(
+            period='week',
 
-        scrobbles_last_week = self.top_by_week('Track', last_week).index.values.sum()
-        tracks_last_week = self.top_by_week('Track', last_week).value_counts('Track').sum()
-        albums_last_week = self.top_by_week('Album', last_week).value_counts('Album').sum()
-        artists_last_week = self.top_by_week('Artist', last_week).value_counts('Artist').sum()
+            df_artists_cur=self.top_by_week('Artist', week),
+            df_albums_cur=self.top_by_week('Album', week),
+            df_tracks_cur=self.top_by_week('Track', week),
 
-        return {
-            'Current Week': {
-                'Artists': artists_cur_week,
-                'Albums': albums_cur_week,
-                'Tracks': tracks_cur_week,
-                'Scrobbles': scrobbles_cur_week,
-                'Avarage Daily': round(scrobbles_cur_week / 7),
-            },
+            df_artists_last=self.top_by_week('Artist', last_week),
+            df_albums_last=self.top_by_week('Album', last_week),
+            df_tracks_last=self.top_by_week('Track', last_week)
+        )
 
-            'Last Week': {
-                'Artists': artists_last_week,
-                'Albums': albums_last_week,
-                'Tracks': tracks_last_week,
-                'Scrobbles': scrobbles_last_week,
-                'Avarage Daily': round(scrobbles_last_week / 7)
-            }
-        }
+    
+    def highlights_month(self, year_month: str) -> HighlighterFM:
+        """
+        Counts stats like the total and average daily scrobbles, total artists and albums of the current and previous month.
+
+        Paramaters:
+            month: Desired month (YYYY-MM).
+
+        Returns:
+            A HighlighterFm object with the month's highlights
+        """
+        last_month = pd.Timestamp(year_month) - pd.Timedelta(4, 'W')
+
+        return HighlighterFM(
+            period='month',
+
+            df_artists_cur=self.top_by_month('Artist', year_month),
+            df_albums_cur=self.top_by_month('Album', year_month),
+            df_tracks_cur=self.top_by_month('Track', year_month),
+
+            df_artists_last=self.top_by_month('Artist', f"{last_month.year}-{last_month.month}"),
+            df_albums_last=self.top_by_month('Album', f"{last_month.year}-{last_month.month}"),
+            df_tracks_last=self.top_by_month('Track', f"{last_month.year}-{last_month.month}")
+        )
+
+    def highlights_year(self, year: str) -> HighlighterFM:
+        """
+        Counts stats like the total and average daily scrobbles, total artists and albums of the current and previous year.
+
+        Paramaters:
+            year: Desired year (YYYY).
+
+        Returns:
+            A HighlighterFm object with the year's highlights
+        """
+        last_year = str( int(year) - 1 )
+
+        return HighlighterFM(
+            period='year',
+
+            df_artists_cur=self.top_by_year('Artist', year),
+            df_albums_cur=self.top_by_year('Album', year),
+            df_tracks_cur=self.top_by_year('Track', year),
+
+            df_artists_last=self.top_by_year('Artist', last_year),
+            df_albums_last=self.top_by_year('Album', last_year),
+            df_tracks_last=self.top_by_year('Track', last_year)
+        )
 
     
     def top_by_week(self, category: str, date: str) -> pd.DataFrame:
