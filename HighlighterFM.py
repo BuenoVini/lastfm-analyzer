@@ -25,9 +25,9 @@ class HighlighterFM:
     percentage_scrobbles: int
     percentage_average_daily: int
 
-    top_artist: Tuple[str, int]
-    top_album: Tuple[str, int]
-    top_track: Tuple[str, int]
+    top_artist: pd.Series
+    top_album: pd.Series
+    top_track: pd.Series
 
 
     def __init__(self, period: str, df_artists_cur: pd.DataFrame, df_albums_cur: pd.DataFrame, df_tracks_cur: pd.DataFrame, df_artists_last: pd.DataFrame, df_albums_last: pd.DataFrame, df_tracks_last: pd.DataFrame) -> None:
@@ -55,9 +55,9 @@ class HighlighterFM:
         object.__setattr__(self, 'percentage_scrobbles', self.__percentage(self.scrobbles_cur, self.scrobbles_last))
         object.__setattr__(self, 'percentage_average_daily', self.__percentage(self.average_daily_cur, self.average_daily_last))
 
-        object.__setattr__(self, 'top_artist', self.__top(df_artists_cur, 'Artist'))
-        object.__setattr__(self, 'top_album', self.__top(df_albums_cur, 'Album'))
-        object.__setattr__(self, 'top_track', self.__top(df_tracks_cur, 'Track'))
+        object.__setattr__(self, 'top_artist', df_artists_cur.iloc[0])
+        object.__setattr__(self, 'top_album', df_albums_cur.iloc[0])
+        object.__setattr__(self, 'top_track', df_tracks_cur.iloc[0])
 
     
     def __str__(self) -> str:
@@ -84,9 +84,9 @@ class HighlighterFM:
         Average Daily: {self.percentage_average_daily}%
 
         --Top listened--
-        Artist: {self.top_artist[0]} with {self.top_artist[1]} scrobbles
-        Album: {self.top_album[0]} with {self.top_album[1]} scrobbles
-        Track: {self.top_track[0]} with {self.top_track[1]} scrobbles
+        Artist: {self.top_artist['Artist']} with {self.top_artist.name} scrobbles
+        Album: {self.top_album['Album']} by {self.top_album['Artist']} with {self.top_album.name} scrobbles
+        Track: {self.top_track['Track']} from {self.top_track['Album']} by {self.top_track['Artist']} with {self.top_track.name} scrobbles
         """
 
 
@@ -103,8 +103,3 @@ class HighlighterFM:
     @staticmethod
     def __percentage(current: int, last: int) -> int:
         return round( ((current / last) - 1) * 100 )
-
-    
-    @staticmethod
-    def __top(df: pd.DataFrame, category: str) -> Tuple[str, int]:
-        return ( df.iloc[0][category], df.index[0] )    # TODO: return a Series to keep the row's info
