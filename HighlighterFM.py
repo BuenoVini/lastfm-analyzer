@@ -69,13 +69,13 @@ class HighlighterFM:
         else:
             raise ValueError(f"period should be: 'year', 'month' or 'week', but '{period}' was passed.")
 
+        period_map = {'year': 365, 'month': 30, 'week': 7}
         # since dataclass is frozen (to prevent the user from changing the fields' values) the assignment must be done through __setattr__()
         # initializing the fields of the current period
         object.__setattr__(self, 'artists_cur', self.__unique(df_artists_cur, 'Artist'))
         object.__setattr__(self, 'albums_cur', self.__unique(df_albums_cur, 'Album'))
         object.__setattr__(self, 'tracks_cur', self.__unique(df_tracks_cur, 'Track'))
         object.__setattr__(self, 'scrobbles_cur', self.__total(df_tracks_cur))
-        period_map = {'year': 365, 'month': 30, 'week': 7}
         object.__setattr__(self, 'average_daily_cur', round(self.scrobbles_cur / period_map[period]))
 
         # initializing the fields of the last period
@@ -122,9 +122,9 @@ class HighlighterFM:
         Average Daily: {self.percentage_average_daily}%
 
         --Top listened--
-        Artist: {self.top_artist['Artist']} with {self.top_artist.name} scrobbles
-        Album: {self.top_album['Album']} by {self.top_album['Artist']} with {self.top_album.name} scrobbles
-        Track: {self.top_track['Track']} from {self.top_track['Album']} by {self.top_track['Artist']} with {self.top_track.name} scrobbles
+        Artist: {self.top_artist['Artist']} with {self.top_artist['Count']} scrobbles
+        Album: {self.top_album['Album']} by {self.top_album['Artist']} with {self.top_album['Count']} scrobbles
+        Track: {self.top_track['Track']} from {self.top_track['Album']} by {self.top_track['Artist']} with {self.top_track['Count']} scrobbles
         """
 
 
@@ -136,8 +136,8 @@ class HighlighterFM:
     
     @staticmethod
     def __total(df: pd.DataFrame) -> int:
-        """Calculates the total amount of scrobbles of the category. That is, it counts how many times a Artist/Album/Track was scrobbled."""
-        return df.index.values.sum()
+        """Calculates the total amount of scrobbles of the category. That is, it counts how many Artist/Album/Track was scrobbled in the dataframe."""
+        return df['Count'].sum()
 
 
     @staticmethod

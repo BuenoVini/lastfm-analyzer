@@ -74,29 +74,29 @@ class AnalyzerFM():
 
         if category == 'Track':
             new_df['Count'] = new_df.groupby(['Track', 'Artist']).transform('count')
-            new_df = new_df.set_index('Count').drop_duplicates(['Track', 'Artist'])
+            new_df.drop_duplicates(['Track', 'Artist'], inplace=True)
 
             # sorting by count, then artist and then by track
-            return new_df.iloc[ np.lexsort([new_df['Track'].str.upper(), new_df['Artist'].str.upper(), -new_df.index]) ]
+            return new_df.iloc[ np.lexsort([new_df['Track'].str.upper(), new_df['Artist'].str.upper(), -new_df['Count']]) ].reset_index(drop=True)
         
         elif category == 'Album':
             new_df = new_df[ ~(new_df['Album'] == 'Last.fm Web Player') ]     # dropping the songs that were listened in Last.fm Web Player
             
             new_df['Count'] = new_df.groupby(['Album', 'Artist']).transform('count')
-            new_df = new_df.set_index('Count').drop_duplicates(['Album', 'Artist']).drop('Track', axis='columns')
+            new_df = new_df.drop_duplicates(['Album', 'Artist']).drop('Track', axis='columns')
 
             # sorting by count, then artist and then by album
-            return new_df.iloc[ np.lexsort([new_df['Album'].str.upper(), new_df['Artist'].str.upper(), -new_df.index]) ]
+            return new_df.iloc[ np.lexsort([new_df['Album'].str.upper(), new_df['Artist'].str.upper(), -new_df['Count']]) ].reset_index(drop=True)
 
         elif category == 'Artist':
             new_df['Count'] = new_df.groupby('Artist').transform('count')['Album']
-            new_df = new_df.set_index('Count').drop_duplicates('Artist').drop(['Track', 'Album'], axis='columns')
+            new_df = new_df.drop_duplicates('Artist').drop(['Track', 'Album'], axis='columns')
 
             # sorting by count and then by artist
-            return new_df.iloc[ np.lexsort([new_df['Artist'].str.upper(), -new_df.index]) ]
+            return new_df.iloc[ np.lexsort([new_df['Artist'].str.upper(), -new_df['Count']]) ].reset_index(drop=True)
         
         else:
-            raise KeyError(category)
+            raise KeyError(category)    # TODO: change to ValueError
 
 
     def highlights_week(self, week: str) -> HighlighterFM:
