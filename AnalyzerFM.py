@@ -2,7 +2,8 @@ from HighlighterFM import HighlighterFM
 from typing import Dict
 from time import sleep
 from LastFM import LastFM
-from datetime import date
+from datetime import datetime, date
+from pytz import utc
 from sys import exit
 import requests_cache # type: ignore
 import pandas as pd # type: ignore
@@ -57,8 +58,9 @@ class AnalyzerFM():
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
 
-        # converting the Date column from string to datetime64 and setting it as index
+        # converting the Date column from string to datetime64, converting to local timezone and setting it as index
         self.df['Date'] = pd.to_datetime(self.df['Date'], format='%d %b %Y, %H:%M')
+        self.df['Date'] = self.df['Date'] + pd.Timedelta(datetime.now().hour - datetime.now(utc).hour, 'H')
         self.df.set_index('Date', inplace=True)
 
         # empty albums cells means that the song was listened in the Last.fm Web Player
