@@ -96,7 +96,7 @@ class AnalyzerFM():
             return new_df.iloc[ np.lexsort([new_df['Artist'].str.upper(), -new_df['Count']]) ].reset_index(drop=True)
         
         else:
-            raise KeyError(category)    # TODO: change to ValueError
+            raise ValueError(f"category should be: 'Artist', 'Album' or 'Track', but '{category}' was passed.")
 
 
     def highlights_week(self, week: str) -> HighlighterFM:
