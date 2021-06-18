@@ -1,9 +1,7 @@
-from HighlighterFM import HighlighterFM
-from typing import Dict
-from time import sleep
 from LastFM import LastFM
-from datetime import datetime, date
-from pytz import utc
+from HighlighterFM import HighlighterFM
+from time import sleep, mktime, localtime, gmtime
+from datetime import date
 from sys import exit
 import requests_cache # type: ignore
 import pandas as pd # type: ignore
@@ -15,12 +13,22 @@ class AnalyzerFM():
 
     Public instance variables:
         df: Dataframe with all scrobbles information of that user.
+        first_day: The day of the first scrobble of that user.
+        last_day: The day of the last scrobble of that user.
 
     Public methods:
-        None.
+        TODO
     """
     def __init__(self, user: str) -> None:
-        """Constructs the user's dataframe used for the Analyzer."""
+        """
+        Constructs the user's dataframe used for the Analyzer.
+
+        Parameters:
+            user: Last.fm username
+
+        Returns:
+            None.
+        """
         api = LastFM()
         pages = []
         current_page = 1
@@ -58,10 +66,17 @@ class AnalyzerFM():
             'Date': [ scrobble['date']['#text'] for page in pages for scrobble in page['recenttracks']['track'] ]
         })
 
-        # converting the Date column from string to datetime64, converting to local timezone and setting it as index
+        # converting the Date column from string to datetime64, converting it to local timezone times and setting it as index
         self.df['Date'] = pd.to_datetime(self.df['Date'], format='%d %b %Y, %H:%M')
-        self.df['Date'] = self.df['Date'] + pd.Timedelta(datetime.now().hour - datetime.now(utc).hour, 'H')
+
+        time_offset = ( mktime(localtime()) - mktime(gmtime()) ) / 3600
+        self.df['Date'] = self.df['Date'] + pd.Timedelta(time_offset, 'H')
+
         self.df.set_index('Date', inplace=True)
+
+        # saving the date of the first and last scrobble
+        self.first_day = self.df.index[-1]
+        self.last_day = self.df.index[0]
 
         # empty albums cells means that the song was listened in the Last.fm Web Player
         self.df['Album'] = self.df['Album'].replace('', 'Last.fm Web Player')
