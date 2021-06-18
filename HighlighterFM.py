@@ -62,7 +62,21 @@ class HighlighterFM:
 
 
     def __init__(self, period: str, df_artists_cur: pd.DataFrame, df_albums_cur: pd.DataFrame, df_tracks_cur: pd.DataFrame, df_artists_last: pd.DataFrame, df_albums_last: pd.DataFrame, df_tracks_last: pd.DataFrame) -> None:
-        """Initializes the class' fields calculating all of their values."""
+        """
+        Initializes the class' fields calculating all of their values.
+
+        Parameters:
+            period: The period selected (either 'year', 'month' or 'week')
+            df_artists_cur: Dataframe with the top Artists in the current period.
+            df_albums_cur: Dataframe with the top Albums in the current period.
+            df_tracks_cur: Dataframe with the top Tracks in the current period.
+            df_artists_last: Dataframe with the top Artists in the last period.
+            df_albums_last: Dataframe with the top Albums in the last period.
+            df_tracks_last: Dataframe with the top Tracks in the last period.
+
+        Returns:
+            None.
+        """
         # verifying if the period passed is valid, if not a ValueError is raised
         if period in 'year month week'.split():
             object.__setattr__(self, 'period', period)
@@ -86,19 +100,24 @@ class HighlighterFM:
         object.__setattr__(self, 'average_daily_last', round(self.scrobbles_last / period_map[period]))
 
         # initializing the percentage fields
-        object.__setattr__(self, 'percentage_artists', self.__percentage(self.artists_cur,self.artists_last))        
-        object.__setattr__(self, 'percentage_albums', self.__percentage(self.albums_cur,self.albums_last))
-        object.__setattr__(self, 'percentage_tracks', self.__percentage(self.tracks_cur,self.tracks_last))
+        object.__setattr__(self, 'percentage_artists', self.__percentage(self.artists_cur, self.artists_last))        
+        object.__setattr__(self, 'percentage_albums', self.__percentage(self.albums_cur, self.albums_last))
+        object.__setattr__(self, 'percentage_tracks', self.__percentage(self.tracks_cur, self.tracks_last))
         object.__setattr__(self, 'percentage_scrobbles', self.__percentage(self.scrobbles_cur, self.scrobbles_last))
         object.__setattr__(self, 'percentage_average_daily', self.__percentage(self.average_daily_cur, self.average_daily_last))
 
-        # initializing the most listened artist, album and track
-        object.__setattr__(self, 'top_artist', df_artists_cur.iloc[0])
-        object.__setattr__(self, 'top_album', df_albums_cur.iloc[0])
-        object.__setattr__(self, 'top_track', df_tracks_cur.iloc[0])
+        # initializing the most listened artist, album and track name
+        if not df_tracks_cur.empty:
+            object.__setattr__(self, 'top_artist', df_artists_cur.iloc[0])
+            object.__setattr__(self, 'top_album', df_albums_cur.iloc[0])
+            object.__setattr__(self, 'top_track', df_tracks_cur.iloc[0])
+        else:
+            object.__setattr__(self, 'top_artist', pd.Series(data={'Artist': '-', 'Count': 0}))
+            object.__setattr__(self, 'top_album', pd.Series(data={'Artist': '-', 'Album': '-', 'Count': 0}))
+            object.__setattr__(self, 'top_track', pd.Series(data={'Artist': '-', 'Album': '-', 'Track': '-', 'Count': 0}))
 
     
-    def __str__(self) -> str:
+    def __str__(self) -> str:   # TODO: show date in print
         return f"""
         --Current {self.period}--
         Total Artists listened: {self.artists_cur}
@@ -143,4 +162,9 @@ class HighlighterFM:
     @staticmethod
     def __percentage(total_cur: int, total_last: int) -> int:
         """Calculates the percentage between the current vs last period of the given field."""
-        return round( ((total_cur / total_last) - 1) * 100 )
+        # checking if at least one total is different than zero
+        if (total_cur or total_last) != 0:
+            total_last = max(1, total_last)     # avoiding division by zero
+            return round( ((total_cur / total_last) - 1) * 100 )
+        else:
+            return 0    # no scrobbles during the current and last period: 0%
