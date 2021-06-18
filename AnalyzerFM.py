@@ -6,6 +6,7 @@ from sys import exit
 import requests_cache # type: ignore
 import pandas as pd # type: ignore
 import numpy as np
+from IPython.core.display import clear_output # type: ignore
 
 class AnalyzerFM():
     """
@@ -47,6 +48,7 @@ class AnalyzerFM():
             # verifying if the response came from the server (and not from the cache)
             if not getattr(response, 'from_cache', False):
                 print(response.status_code, current_page, response.json()['recenttracks']['@attr']['totalPages'])
+                clear_output(wait=True)
                 sleep(0.25)
 
             # append current response to pages
@@ -69,7 +71,7 @@ class AnalyzerFM():
         # converting the Date column from string to datetime64, converting it to local timezone times and setting it as index
         self.df['Date'] = pd.to_datetime(self.df['Date'], format='%d %b %Y, %H:%M')
 
-        time_offset = ( mktime(localtime()) - mktime(gmtime()) ) / 3600
+        time_offset = ( mktime(localtime()) - mktime(gmtime()) ) / 3600 # TODO: use api._timezone_offset
         self.df['Date'] = self.df['Date'] + pd.Timedelta(time_offset, 'H')
 
         self.df.set_index('Date', inplace=True)
