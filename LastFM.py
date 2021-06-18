@@ -1,7 +1,8 @@
 import requests
 from datetime import datetime
 from datetime import date
-from typing import Dict
+from time import mktime, localtime, gmtime
+from typing import Dict, Final
 from dotenv import dotenv_values
 
 class LastFM:
@@ -15,8 +16,9 @@ class LastFM:
         get_recent_tracks(): Gets the user's recent played tracks within the interval [from_date, to_date).
     """
     def __init__(self) -> None:
-        """Constructs all the necessary attributes for the LastFM object, such as the API keys."""
+        """Constructs all the necessary attributes for the LastFM object, such as the API keys and the time zone offset."""
         self.__config = dotenv_values('.env')
+        self.__timezone_offset: Final = int( (mktime(localtime()) - mktime(gmtime())) / 3600 )
 
 
     def __get(self, payload: Dict[str, str]) -> requests.models.Response:
@@ -34,12 +36,18 @@ class LastFM:
             raise Exception("dotenv_values() returned None")
 
 
-    @staticmethod
-    def __date_seconds(date_input: str) -> str:
-        """Converts the date_input string ('YYYY-MM-DD') to the Unix Timestamp notation."""
-        date_output = datetime.strptime(date_input, "%Y-%m-%d")      # converts the date string to struct_time
+    def __date_seconds(self, date_input: str) -> int:
+        """Converts the date_input string ('YYYY-MM-DD') to the Unix Timestamp notation. The return value is in UTC time zone but taking the user's time zone into consideration."""
+        # converts the date string to datetime
+        date_output = datetime.strptime(date_input, "%Y-%m-%d")
 
-        return f"{(date(date_output.year, date_output.month, date_output.day) - date(1970, 1, 1)).total_seconds():.0f}"    # instead of returning a float (e.g., 629510400.0), it returns a string (e.g., '629510400')
+        # calculating the Unix Timestamp value (e.g., 629510400) in UTC
+        local_seconds = (date(date_output.year, date_output.month, date_output.day) - date(1970, 1, 1)).total_seconds()
+
+        # returning the UTC value but with the user's time zone into account. e.g.:
+        # from 629510400: Dec 13 1989 00:00:00 (UTC) == Dec 12 1989 21:00:00 (local -3 UTC)
+        # to 629521200: Dec 13 1989 03:00:00 (UTC) == Dec 13 1989 00:00:00 (local -3 UTC)
+        return int(local_seconds) - self.__timezone_offset*3600
             
 
     def get_recent_tracks(self, user: str, from_date: str, to_date: str, limit: int = 50, page: int = 1) -> requests.models.Response:
@@ -60,8 +68,8 @@ class LastFM:
         payload = {
             'method': 'user.getrecenttracks', 
             'user': user,
-            'from': self.__date_seconds(from_date), 
-            'to': self.__date_seconds(to_date),
+            'from': str(self.__date_seconds(from_date)), 
+            'to': str(self.__date_seconds(to_date) - 1),    # instead of 00:00:00, it is desired 23:59:59
             'limit': str( max(1, min(limit, 200)) ),
             'page': str(page)
         }
