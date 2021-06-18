@@ -1,5 +1,6 @@
-.env
-sandbox
-__pycache__
+sandbox/
+__pycache__/
+test_env/
 *.sqlite
 *.ipynb
+.env
