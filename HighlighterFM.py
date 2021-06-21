@@ -11,16 +11,16 @@ class HighlighterFM:
     Public fields:
         period: Indicates whether it is a year, month or week highlight.
 
-        artists_cur: Total Artists scrobbled in the current period.
-        albums_cur: Total Albums scrobbled in the current period.
-        tracks_cur: Total Tracks scrobbled in the current period.
-        scrobbles_cur: Total scrobbles in the current period.
-        average_daily_cur: Average daily of scrobbles in the current period.
+        total_artists: Total Artists scrobbled in the current period.
+        total_albums: Total Albums scrobbled in the current period.
+        total_tracks: Total Tracks scrobbled in the current period.
+        total_scrobbles: Total scrobbles in the current period.
+        average_daily: Average daily of scrobbles in the current period.
 
-        artists_last: Total Artists scrobbled in the last period.
-        albums_last: Total Albums scrobbled in the last period.
-        tracks_last: Total Tracks scrobbled in the last period.
-        scrobbles_last: Total scrobbles in the last period.
+        total_artists_last: Total Artists scrobbled in the last period.
+        total_albums_last: Total Albums scrobbled in the last period.
+        total_tracks_last: Total Tracks scrobbled in the last period.
+        total_scrobbles_last: Total scrobbles in the last period.
         average_daily_last: Average daily of scrobbles in the last period.
 
         percentage_artists: Percentage between the total Artists in the current vs. last period.
@@ -38,16 +38,16 @@ class HighlighterFM:
     """
     period: str
 
-    artists_cur: int
-    albums_cur: int
-    tracks_cur: int
-    scrobbles_cur: int
-    average_daily_cur: int
+    total_artists: int
+    total_albums: int
+    total_tracks: int
+    total_scrobbles: int
+    average_daily: int
 
-    artists_last: int
-    albums_last: int
-    tracks_last: int
-    scrobbles_last: int
+    total_artists_last: int     # TODO: should they be private ??
+    total_albums_last: int
+    total_tracks_last: int
+    total_scrobbles_last: int
     average_daily_last: int
 
     percentage_artists: int
@@ -86,25 +86,25 @@ class HighlighterFM:
         period_map = {'year': 365, 'month': 30, 'week': 7}
         # since dataclass is frozen (to prevent the user from changing the fields' values) the assignment must be done through __setattr__()
         # initializing the fields of the current period
-        object.__setattr__(self, 'artists_cur', self.__unique(df_artists_cur, 'Artist'))
-        object.__setattr__(self, 'albums_cur', self.__unique(df_albums_cur, 'Album'))
-        object.__setattr__(self, 'tracks_cur', self.__unique(df_tracks_cur, 'Track'))
-        object.__setattr__(self, 'scrobbles_cur', self.__total(df_tracks_cur))
-        object.__setattr__(self, 'average_daily_cur', round(self.scrobbles_cur / period_map[period]))
+        object.__setattr__(self, 'total_artists', self.__unique(df_artists_cur, 'Artist'))
+        object.__setattr__(self, 'total_albums', self.__unique(df_albums_cur, 'Album'))
+        object.__setattr__(self, 'total_tracks', self.__unique(df_tracks_cur, 'Track'))
+        object.__setattr__(self, 'total_scrobbles', self.__total(df_tracks_cur))
+        object.__setattr__(self, 'average_daily', round(self.total_scrobbles / period_map[period]))
 
         # initializing the fields of the last period
-        object.__setattr__(self, 'artists_last', self.__unique(df_artists_last, 'Artist'))
-        object.__setattr__(self, 'albums_last', self.__unique(df_albums_last, 'Album'))
-        object.__setattr__(self, 'tracks_last', self.__unique(df_tracks_last, 'Track'))
-        object.__setattr__(self, 'scrobbles_last', self.__total(df_tracks_last))
-        object.__setattr__(self, 'average_daily_last', round(self.scrobbles_last / period_map[period]))
+        object.__setattr__(self, 'total_artists_last', self.__unique(df_artists_last, 'Artist'))
+        object.__setattr__(self, 'total_albums_last', self.__unique(df_albums_last, 'Album'))
+        object.__setattr__(self, 'total_tracks_last', self.__unique(df_tracks_last, 'Track'))
+        object.__setattr__(self, 'total_scrobbles_last', self.__total(df_tracks_last))
+        object.__setattr__(self, 'average_daily_last', round(self.total_scrobbles_last / period_map[period]))
 
         # initializing the percentage fields
-        object.__setattr__(self, 'percentage_artists', self.__percentage(self.artists_cur, self.artists_last))        
-        object.__setattr__(self, 'percentage_albums', self.__percentage(self.albums_cur, self.albums_last))
-        object.__setattr__(self, 'percentage_tracks', self.__percentage(self.tracks_cur, self.tracks_last))
-        object.__setattr__(self, 'percentage_scrobbles', self.__percentage(self.scrobbles_cur, self.scrobbles_last))
-        object.__setattr__(self, 'percentage_average_daily', self.__percentage(self.average_daily_cur, self.average_daily_last))
+        object.__setattr__(self, 'percentage_artists', self.__percentage(self.total_artists, self.total_artists_last))
+        object.__setattr__(self, 'percentage_albums', self.__percentage(self.total_albums, self.total_albums_last))
+        object.__setattr__(self, 'percentage_tracks', self.__percentage(self.total_tracks, self.total_tracks_last))
+        object.__setattr__(self, 'percentage_scrobbles', self.__percentage(self.total_scrobbles, self.total_scrobbles_last))
+        object.__setattr__(self, 'percentage_average_daily', self.__percentage(self.average_daily, self.average_daily_last))
 
         # initializing the most listened artist, album and track name
         if not df_tracks_cur.empty:
@@ -120,17 +120,17 @@ class HighlighterFM:
     def __str__(self) -> str:   # TODO: show date in print
         return f"""
         --Current {self.period}--
-        Total Artists listened: {self.artists_cur}
-        Total Albums listened: {self.albums_cur}
-        Total Tracks listened: {self.tracks_cur}
-        Total Scrobbles: {self.scrobbles_cur}
-        Average Daily: {self.average_daily_cur}
+        Total Artists listened: {self.total_artists}
+        Total Albums listened: {self.total_albums}
+        Total Tracks listened: {self.total_tracks}
+        Total Scrobbles: {self.total_scrobbles}
+        Average Daily: {self.average_daily}
         
         --Previous {self.period}--
-        Total Artists listened: {self.artists_last}
-        Total Albums listened: {self.albums_last}
-        Total Tracks listened: {self.tracks_last}
-        Total Scrobbles: {self.scrobbles_last}
+        Total Artists listened: {self.total_artists_last}
+        Total Albums listened: {self.total_albums_last}
+        Total Tracks listened: {self.total_tracks_last}
+        Total Scrobbles: {self.total_scrobbles_last}
         Average Daily: {self.average_daily_last}
         
         --Statistics vs. previous {self.period}--
