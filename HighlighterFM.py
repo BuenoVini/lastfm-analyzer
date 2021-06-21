@@ -29,9 +29,9 @@ class HighlighterFM:
         percentage_scrobbles: Percentage between the total scrobbles in the current vs. last period.
         percentage_average_daily: Percentage between the average daily scrobbles in the current vs. last period.
 
-        top_artist: The name of the most listened Artist in the current period.
-        top_album: The name of the most listened Album and Artist in the current period.
-        top_track: The name of the most listened Track, Album and Artist in the current period.
+        df_top_artist: The name of the most listened Artist in the current period.
+        df_top_album: The name of the most listened Album and Artist in the current period.
+        df_top_track: The name of the most listened Track, Album and Artist in the current period.
 
     Public methods:
         None.
@@ -56,9 +56,9 @@ class HighlighterFM:
     percentage_scrobbles: int
     percentage_average_daily: int
 
-    top_artist: pd.Series
-    top_album: pd.Series
-    top_track: pd.Series
+    df_top_artist: pd.Series
+    df_top_album: pd.Series
+    df_top_track: pd.Series
 
 
     def __init__(self, period: str, df_artists_cur: pd.DataFrame, df_albums_cur: pd.DataFrame, df_tracks_cur: pd.DataFrame, df_artists_last: pd.DataFrame, df_albums_last: pd.DataFrame, df_tracks_last: pd.DataFrame) -> None:
@@ -108,13 +108,13 @@ class HighlighterFM:
 
         # initializing the most listened artist, album and track name
         if not df_tracks_cur.empty:
-            object.__setattr__(self, 'top_artist', df_artists_cur.iloc[0])
-            object.__setattr__(self, 'top_album', df_albums_cur.iloc[0])
-            object.__setattr__(self, 'top_track', df_tracks_cur.iloc[0])
+            object.__setattr__(self, 'df_top_artist', df_artists_cur.iloc[0])
+            object.__setattr__(self, 'df_top_album', df_albums_cur.iloc[0])
+            object.__setattr__(self, 'df_top_track', df_tracks_cur.iloc[0])
         else:
-            object.__setattr__(self, 'top_artist', pd.Series(data={'Artist': '-', 'Count': 0}))
-            object.__setattr__(self, 'top_album', pd.Series(data={'Artist': '-', 'Album': '-', 'Count': 0}))
-            object.__setattr__(self, 'top_track', pd.Series(data={'Artist': '-', 'Album': '-', 'Track': '-', 'Count': 0}))
+            object.__setattr__(self, 'df_top_artist', pd.Series(data={'Artist': '-', 'Count': 0}))
+            object.__setattr__(self, 'df_top_album', pd.Series(data={'Artist': '-', 'Album': '-', 'Count': 0}))
+            object.__setattr__(self, 'df_top_track', pd.Series(data={'Artist': '-', 'Album': '-', 'Track': '-', 'Count': 0}))
 
     
     def __str__(self) -> str:   # TODO: show date in print
@@ -141,9 +141,9 @@ class HighlighterFM:
         Average Daily: {self.percentage_average_daily}%
 
         --Top listened--
-        Artist: {self.top_artist['Artist']} with {self.top_artist['Count']} scrobbles
-        Album: {self.top_album['Album']} by {self.top_album['Artist']} with {self.top_album['Count']} scrobbles
-        Track: {self.top_track['Track']} from {self.top_track['Album']} by {self.top_track['Artist']} with {self.top_track['Count']} scrobbles
+        Artist: {self.df_top_artist['Artist']} with {self.df_top_artist['Count']} scrobbles
+        Album: {self.df_top_album['Album']} by {self.df_top_album['Artist']} with {self.df_top_album['Count']} scrobbles
+        Track: {self.df_top_track['Track']} from {self.df_top_track['Album']} by {self.df_top_track['Artist']} with {self.df_top_track['Count']} scrobbles
         """
 
 
