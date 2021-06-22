@@ -126,6 +126,7 @@ class AnalyzerFM():
         Returns:
             A HighlighterFm object with the week's highlights
         """
+        # TODO: verify if the date passed is valid: YYYY-MM-DD
         last_week = pd.Timestamp(week) - pd.Timedelta(7, 'D')
 
         return HighlighterFM(
@@ -151,6 +152,7 @@ class AnalyzerFM():
         Returns:
             A HighlighterFm object with the month's highlights
         """
+        # TODO: verify if the date passed is valid: YYYY-MM
         last_month = pd.Timestamp(year_month) - pd.Timedelta(4, 'W')
 
         return HighlighterFM(
@@ -175,6 +177,7 @@ class AnalyzerFM():
         Returns:
             A HighlighterFm object with the year's highlights
         """
+        # TODO: verify if the date passed is valid: YYYY
         last_year = str( int(year) - 1 )
 
         return HighlighterFM(
@@ -204,6 +207,7 @@ class AnalyzerFM():
         """
         current_week = pd.Timestamp(date)
         last_week = current_week - pd.Timedelta(7, 'D')
+        current_week -= pd.Timedelta(1, 'S')
 
         return self.__top(self.df.loc[current_week:last_week], category)
 
