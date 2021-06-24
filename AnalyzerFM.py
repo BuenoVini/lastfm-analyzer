@@ -58,6 +58,7 @@ class AnalyzerFM():
             if current_page < int(response.json()['recenttracks']['@attr']['totalPages']):
                 current_page += 1
             else:
+                print("All pages fetched!")
                 break
         
         # creating the dataframe to be used by the Analyzer
@@ -82,6 +83,24 @@ class AnalyzerFM():
 
         # empty albums cells means that the song was listened in the Last.fm Web Player
         self.df['Album'] = self.df['Album'].replace('', 'Last.fm Web Player')
+
+
+    @staticmethod
+    def __validate_period(period: str) -> None:
+        """Verifies if the period string is valid, if not a ValueError is raised."""
+        if period not in 'year month week'.split():
+            raise ValueError(f"period should be: 'year', 'month' or 'week', but '{period}' was passed.")
+
+    
+    @staticmethod
+    def __percentage(current_total: int, previous_total: int) -> int:
+        """Calculates the percentage between the current vs last period of the given field."""
+        # checking if at least one total is different than zero
+        if (current_total or previous_total) != 0:
+            previous_total = max(1, previous_total)     # avoiding division by zero
+            return round( ((current_total / previous_total) - 1) * 100 )
+        else:
+            return 0    # no scrobbles during the current and last period: 0%
 
 
     @staticmethod
@@ -116,137 +135,112 @@ class AnalyzerFM():
             raise ValueError(f"category should be: 'Artist', 'Album' or 'Track', but '{category}' was passed.")
 
 
-    def highlights_week(self, week: str) -> HighlighterFM:
-        """
-        Counts stats like the total and average daily scrobbles, total artists and albums of the current and previous week.
+    def top_by(self, period: str, category: str, date: str) -> pd.DataFrame:    # TODO: change to top_by(self, period: str, date: str, category: str)
+        # verifying if the period passed is valid
+        self.__validate_period(period)
 
-        Paramaters:
-            week: Desired week (YYYY-MM-DD).
+        if period == 'year' or period == 'month':
+            return self.__top(self.df.loc[date], category)
 
-        Returns:
-            A HighlighterFm object with the week's highlights
-        """
-        # TODO: verify if the date passed is valid: YYYY-MM-DD
-        last_week = pd.Timestamp(week) - pd.Timedelta(7, 'D')
+        else: # period == 'week':
+            current_week = pd.Timestamp(date)
+            last_week = current_week - pd.Timedelta(7, 'D')
+            current_week -= pd.Timedelta(1, 'S')    # TODO: should I change the approach to this problem ??
 
+            return self.__top(self.df.loc[current_week:last_week], category)
+
+
+    def highlights_of(self, period: str, date: str) -> HighlighterFM:
+        # verifying if the period passed is valid
+        self.__validate_period(period)
+
+        # creating the dataframes with artists, albums, and tracks of the given period
+        df_artists = self.top_by(period, 'Artist', date)
+        df_albums = self.top_by(period, 'Album', date)
+        df_tracks = self.top_by(period, 'Track', date)
+
+        # computing the fields of the given period
+        total_artists = df_artists.value_counts('Artist').sum()
+        total_albums = df_albums.value_counts('Album').sum()
+        total_tracks = df_tracks.value_counts('Track').sum()
+        total_scrobbles = df_tracks['Count'].sum()
+        average_daily = round(total_scrobbles / {'year': 365, 'month': 30, 'week': 7}[period])
+
+        # finding the most listened artist, album, and track name
+        if not df_tracks.empty:
+            df_top_artist = df_artists.iloc[0]
+            df_top_album = df_albums.iloc[0]
+            df_top_track = df_tracks.iloc[0]
+        else:
+            df_top_artist = pd.Series(data={'Artist': '-', 'Count': 0})
+            df_top_album = pd.Series(data={'Artist': '-', 'Album': '-', 'Count': 0})
+            df_top_track = pd.Series(data={'Artist': '-', 'Album': '-', 'Track': '-', 'Count': 0})
+        
+        # setting the HighlighterFM fields and returning it
         return HighlighterFM(
-            period='week',
-
-            df_artists_cur=self.top_by_week('Artist', week),
-            df_albums_cur=self.top_by_week('Album', week),
-            df_tracks_cur=self.top_by_week('Track', week),
-
-            df_artists_last=self.top_by_week('Artist', last_week),
-            df_albums_last=self.top_by_week('Album', last_week),
-            df_tracks_last=self.top_by_week('Track', last_week)
+            period,
+            total_artists,
+            total_albums,
+            total_tracks,
+            total_scrobbles,
+            average_daily,
+            df_top_artist,
+            df_top_album,
+            df_top_track
         )
 
-    
-    def highlights_month(self, year_month: str) -> HighlighterFM:
+
+    def summary_highlights(self, period: str, date: str) -> str:
+        # verifying if the period passed is valid
+        self.__validate_period(period)
+
+        # computing the highlights of the current date
+        current_highlights = self.highlights_of(period, date)
+
+        # computing the highlights of the previous date
+        if period == 'year':
+            previous_date = pd.Timestamp.strftime(pd.Timestamp(date) - pd.Timedelta(52, 'W'), format='%Y')
+
+        elif period == 'month':
+            previous_date = pd.Timestamp.strftime(pd.Timestamp(date) - pd.Timedelta(4, 'W'), format='%Y-%m')
+
+        else: # period == 'week':
+            previous_date = pd.Timestamp.strftime(pd.Timestamp(date) - pd.Timedelta(1, 'W'), format='%Y-%m-%d')
+        
+        previous_highlights = self.highlights_of(period, previous_date)
+
+        # computing the percentage
+        percentage_artists = self.__percentage(current_highlights.total_artists, previous_highlights.total_artists)
+        percentage_albums = self.__percentage(current_highlights.total_albums, previous_highlights.total_albums)
+        percentage_tracks = self.__percentage(current_highlights.total_tracks, previous_highlights.total_tracks)
+        percentage_scrobbles = self.__percentage(current_highlights.total_scrobbles, previous_highlights.total_scrobbles)
+        percentage_average_daily = self.__percentage(current_highlights.average_daily, previous_highlights.average_daily)
+
+        # returning the message with the highlights compared with the previous date
+        return f"""
+        --{period.title()}: {date}--
+        Total Artists listened: {current_highlights.total_artists}
+        Total Albums listened: {current_highlights.total_albums}
+        Total Tracks listened: {current_highlights.total_tracks}
+        Total Scrobbles: {current_highlights.total_scrobbles}
+        Average Daily: {current_highlights.average_daily}
+        
+        --Previous {period}: {previous_date}--
+        Total Artists listened: {previous_highlights.total_artists}
+        Total Albums listened: {previous_highlights.total_albums}
+        Total Tracks listened: {previous_highlights.total_tracks}
+        Total Scrobbles: {previous_highlights.total_scrobbles}
+        Average Daily: {previous_highlights.average_daily}
+        
+        --Statistics vs. previous {period}--
+        Total Artists listened: {percentage_artists}%
+        Total Albums listened: {percentage_albums}%
+        Total Tracks listened: {percentage_tracks}%
+        Total Scrobbles: {percentage_scrobbles}%
+        Average Daily: {percentage_average_daily}%
+
+        --Top listened--
+        Artist: {current_highlights.df_top_artist['Artist']} with {current_highlights.df_top_artist['Count']} scrobbles
+        Album: {current_highlights.df_top_album['Album']} by {current_highlights.df_top_album['Artist']} with {current_highlights.df_top_album['Count']} scrobbles
+        Track: {current_highlights.df_top_track['Track']} from {current_highlights.df_top_track['Album']} by {current_highlights.df_top_track['Artist']} with {current_highlights.df_top_track['Count']} scrobbles
         """
-        Counts stats like the total and average daily scrobbles, total artists and albums of the current and previous month.
-
-        Paramaters:
-            month: Desired month (YYYY-MM).
-
-        Returns:
-            A HighlighterFm object with the month's highlights
-        """
-        # TODO: verify if the date passed is valid: YYYY-MM
-        last_month = pd.Timestamp(year_month) - pd.Timedelta(4, 'W')
-
-        return HighlighterFM(
-            period='month',
-
-            df_artists_cur=self.top_by_month('Artist', year_month),
-            df_albums_cur=self.top_by_month('Album', year_month),
-            df_tracks_cur=self.top_by_month('Track', year_month),
-
-            df_artists_last=self.top_by_month('Artist', f"{last_month.year}-{last_month.month}"),
-            df_albums_last=self.top_by_month('Album', f"{last_month.year}-{last_month.month}"),
-            df_tracks_last=self.top_by_month('Track', f"{last_month.year}-{last_month.month}")
-        )
-
-    def highlights_year(self, year: str) -> HighlighterFM:
-        """
-        Counts stats like the total and average daily scrobbles, total artists and albums of the current and previous year.
-
-        Paramaters:
-            year: Desired year (YYYY).
-
-        Returns:
-            A HighlighterFm object with the year's highlights
-        """
-        # TODO: verify if the date passed is valid: YYYY
-        last_year = str( int(year) - 1 )
-
-        return HighlighterFM(
-            period='year',
-
-            df_artists_cur=self.top_by_year('Artist', year),
-            df_albums_cur=self.top_by_year('Album', year),
-            df_tracks_cur=self.top_by_year('Track', year),
-
-            df_artists_last=self.top_by_year('Artist', last_year),
-            df_albums_last=self.top_by_year('Album', last_year),
-            df_tracks_last=self.top_by_year('Track', last_year)
-        )
-
-    
-    def top_by_week(self, category: str, date: str) -> pd.DataFrame:
-        """
-        Finds the top category (Artist, Track or Album) in the period of one week.
-        NOTE: The day passed as parameter is open-ended, meaning that this day is not taken into account.
-
-        Parameters:
-            category: Can be either 'Artist', 'Album' or 'Track'.
-            date: Desired date (YYYY-MM-DD).
-
-        Returns:
-            A list with the top category for the period of one week.
-        """
-        current_week = pd.Timestamp(date)
-        last_week = current_week - pd.Timedelta(7, 'D')
-        current_week -= pd.Timedelta(1, 'S')
-
-        return self.__top(self.df.loc[current_week:last_week], category)
-
-
-    def top_by_month(self, category: str, year_month: str) -> pd.DataFrame:
-        """
-        Finds the top category (Artist, Track or Album) of a specif month of the given year.
-
-        Parameters:
-            category: Can be either 'Artist', 'Album' or 'Track'.
-            year_month: Desired date (YYYY-MM).
-
-        Returns:
-            A list with the top category for the given month.
-        """
-        return self.__top(self.df.loc[year_month], category)
-
-
-    def top_by_year(self, category: str, year: str) -> pd.DataFrame:
-        """
-        Finds the top category (Artist, Track or Album) of the whole year.
-
-        Parameters:
-            category: Can be either 'Artist', 'Album' or 'Track'.
-            year: Desired year (YYYY).
-
-        Returns:
-            A list with the top category for the given year.
-        """
-        return self.__top(self.df.loc[year], category)
-
-
-
-if __name__ == '__main__':
-    analyzer = AnalyzerFM('Vini_Bueno')
-    # for month in range(1, 6):
-    #     print(f"\n2021-{month}", analyzer.top_by_month('Artist', 2021, month)[0:10], sep='\n')
-
-    for year in [2018, 2019, 2020, 2021]:
-        print(f"\n{year}", analyzer.top_by_year('Track', str(year)).head(), sep='\n')
-
-    # print("\nLast week:", analyzer.top_by_week('Track', 2021, 6, 3).head(), sep='\n')
