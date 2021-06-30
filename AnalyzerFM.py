@@ -72,8 +72,7 @@ class AnalyzerFM():
         # converting the Date column from string to datetime64, converting it to local timezone times and setting it as index
         self.df['Date'] = pd.to_datetime(self.df['Date'], format='%d %b %Y, %H:%M')
 
-        time_offset = ( mktime(localtime()) - mktime(gmtime()) ) / 3600 # TODO: use api._timezone_offset
-        self.df['Date'] = self.df['Date'] + pd.Timedelta(time_offset, 'H')
+        self.df['Date'] = self.df['Date'] + pd.Timedelta(api.timezone_offset, 'H')
 
         self.df.set_index('Date', inplace=True)
 

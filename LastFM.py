@@ -21,6 +21,11 @@ class LastFM:
         self.__timezone_offset: Final = int( (mktime(localtime()) - mktime(gmtime())) / 3600 )
 
 
+    @property
+    def timezone_offset(self) -> int:
+        return self.__timezone_offset
+    
+
     def __get(self, payload: Dict[str, str]) -> requests.models.Response:
         """Returns the response from the Last.fm servers."""
         url = 'http://ws.audioscrobbler.com/2.0'                # the API root URL location
