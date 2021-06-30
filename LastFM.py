@@ -23,6 +23,7 @@ class LastFM:
 
     @property
     def timezone_offset(self) -> int:
+        """A getter method for the timezone_offset attribute."""
         return self.__timezone_offset
     
 

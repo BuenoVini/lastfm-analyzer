@@ -1,6 +1,6 @@
 from LastFM import LastFM
 from HighlighterFM import HighlighterFM
-from time import sleep, mktime, localtime, gmtime
+from time import sleep
 from datetime import date
 from sys import exit
 import requests_cache # type: ignore
@@ -18,7 +18,9 @@ class AnalyzerFM():
         last_day: The day of the last scrobble of that user.
 
     Public methods:
-        TODO
+        top_by(): Finds the top Artist/Album/Track for the given period.
+        highlights_of(): Computes the highlights of Artists, Albums, and Tracks for the given period.
+        summary_highlights(): A comparison of the highlights of Artists, Albums, and Tracks for the given period and the previous period.
     """
     def __init__(self, user: str) -> None:
         """
@@ -135,9 +137,23 @@ class AnalyzerFM():
 
 
     def top_by(self, period: str, date: str, category: str) -> pd.DataFrame:
+        """
+        Finds the top Artist/Album/Track for the given period.
+
+        Parameters:
+            period: Can either be 'year', 'month', or 'week'.
+            date: If period is 'year' then date is 'YYYY'. For 'month', date is 'YYYY-MM'. And, for 'week', data is 'YYYY-MM-DD'.
+            category: Can either be 'Artist', 'Album', or 'Track'.
+
+            NOTE: If date='week', then the day passed as parameter is open-ended, meaning that the day in 'date' is not taken into account (only the day before).
+
+        Returns:
+            A dataframe with the top values of the chosen category.
+        """
         # verifying if the period passed is valid
         self.__validate_period(period)
 
+        # returns a dataframe with the top values of the chosen category
         if period == 'year' or period == 'month':
             return self.__top(self.df.loc[date], category)
 
@@ -151,6 +167,18 @@ class AnalyzerFM():
 
 
     def highlights_of(self, period: str, date: str) -> HighlighterFM:
+        """
+        Creates and returns a HighlighterFM dataclass that contains the highlights of Artists, Albums, and Tracks for the given period.
+
+        Parameters:
+            period: Can either be 'year', 'month', or 'week'.
+            date: If period is 'year' then date is 'YYYY'. For 'month', date is 'YYYY-MM'. And, for 'week', data is 'YYYY-MM-DD'.
+
+            NOTE: If date='week', then the day passed as parameter is open-ended, meaning that the day in 'date' is not taken into account (only the day before).
+
+        Returns:
+            A HighlighterFM dataclass with the highlights of the period.
+        """
         # verifying if the period passed is valid
         self.__validate_period(period)
 
@@ -191,6 +219,23 @@ class AnalyzerFM():
 
 
     def summary_highlights(self, period: str, date: str) -> str:
+        """
+        Returns a string with a comparison of the highlights of Artists, Albums, and Tracks for the given period and the previous period (year/month/week).
+        The highlights include:
+            (current period) Total Artists listened, Total Albums listened, Total Tracks listened, Total Scrobbles, Average Daily.
+            (previous period) Total Artists listened, Total Albums listened, Total Tracks listened, Total Scrobbles, Average Daily.
+            (percentage current/previous) Total Artists listened, Total Albums listened, Total Tracks listened, Total Scrobbles, Average Daily.
+            (top listened) Artist, Album, Track and their counts.
+
+        Parameters:
+            period: Can either be 'year', 'month', or 'week'.
+            date: If period is 'year' then date is 'YYYY'. For 'month', date is 'YYYY-MM'. And, for 'week', data is 'YYYY-MM-DD'.
+
+            NOTE: If date='week', then the day passed as parameter is open-ended, meaning that the day in 'date' is not taken into account (only the day before).
+
+        Returns:
+            A string with the comparison between the current and the previous period.
+        """
         # verifying if the period passed is valid
         self.__validate_period(period)
 
