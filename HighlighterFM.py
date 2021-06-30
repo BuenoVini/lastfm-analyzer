@@ -1,11 +1,10 @@
 from dataclasses import dataclass
 import pandas as pd # type: ignore
-# from AnalyzerFM import AnalyzerFM
 
 @dataclass(frozen=True)
-class HighlighterFM: # TODO: change docstring
+class HighlighterFM:
     """
-    A data class with a bunch of statistics based on Artists, Albums and Tracks. The analysis is done comparing a current date and the previous date.
+    A data class with highlights of a specific period of Artists, Albums and Tracks.
 
     Public fields:
         period: Indicates whether it is a year, month or week highlight.
@@ -16,9 +15,9 @@ class HighlighterFM: # TODO: change docstring
         total_scrobbles: Total scrobbles in the current period.
         average_daily: Average daily of scrobbles in the current period.
 
-        df_top_artist: The name of the most listened Artist in the current period.
-        df_top_album: The name of the most listened Album and Artist in the current period.
-        df_top_track: The name of the most listened Track, Album and Artist in the current period.
+        df_top_artist: The name of the most listened Artist in the current period and its count.
+        df_top_album: The name of the most listened Album and Artist in the current period and its count.
+        df_top_track: The name of the most listened Track, Album and Artist in the current period and its count.
 
     Public methods:
         None.
