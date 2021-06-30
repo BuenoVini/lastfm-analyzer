@@ -135,7 +135,7 @@ class AnalyzerFM():
             raise ValueError(f"category should be: 'Artist', 'Album' or 'Track', but '{category}' was passed.")
 
 
-    def top_by(self, period: str, category: str, date: str) -> pd.DataFrame:    # TODO: change to top_by(self, period: str, date: str, category: str)
+    def top_by(self, period: str, date: str, category: str) -> pd.DataFrame:
         # verifying if the period passed is valid
         self.__validate_period(period)
 
@@ -145,8 +145,9 @@ class AnalyzerFM():
         else: # period == 'week':
             current_week = pd.Timestamp(date)
             last_week = current_week - pd.Timedelta(7, 'D')
-            current_week -= pd.Timedelta(1, 'S')    # TODO: should I change the approach to this problem ??
+            current_week -= pd.Timedelta(1, 'S')    # current_week looks like Timestamp('YYYY-MM-DD 23:59:59')
 
+            # OBS: the dataframe slice below is made using Timestamps ('YYYY-MM-DD hh:mm:ss') and not strings
             return self.__top(self.df.loc[current_week:last_week], category)
 
 
@@ -155,9 +156,9 @@ class AnalyzerFM():
         self.__validate_period(period)
 
         # creating the dataframes with artists, albums, and tracks of the given period
-        df_artists = self.top_by(period, 'Artist', date)
-        df_albums = self.top_by(period, 'Album', date)
-        df_tracks = self.top_by(period, 'Track', date)
+        df_artists = self.top_by(period, date, 'Artist')
+        df_albums = self.top_by(period, date, 'Album')
+        df_tracks = self.top_by(period, date, 'Track')
 
         # computing the fields of the given period
         total_artists = df_artists.value_counts('Artist').sum()
