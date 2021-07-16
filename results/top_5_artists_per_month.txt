@@ -1,0 +1,176 @@
+---Oct/2019---
+         Artist  Count
+1     Lady Gaga     54
+2  Lana Del Rey     41
+3   Linkin Park     39
+4  Foo Fighters     33
+5          Muse     31
+
+---Nov/2019---
+          Artist  Count
+1  Ariana Grande     63
+2   Foo Fighters     58
+3    Linkin Park     51
+4       Slipknot     48
+5   Lana Del Rey     44
+
+---Dec/2019---
+          Artist  Count
+1   Lana Del Rey     73
+2  Avril Lavigne     39
+3      Lady Gaga     31
+4       Bee Gees     29
+5          Queen     29
+
+---Jan/2020---
+          Artist  Count
+1   Taylor Swift     88
+2   Foo Fighters     60
+3  Avril Lavigne     50
+4   Lana Del Rey     45
+5       CHVRCHES     44
+
+---Feb/2020---
+          Artist  Count
+1   Taylor Swift    208
+2    Linkin Park     68
+3  Ariana Grande     65
+4   Foo Fighters     65
+5       Slipknot     49
+
+---Mar/2020---
+          Artist  Count
+1   Taylor Swift    458
+2   Foo Fighters    108
+3    Linkin Park     62
+4  Avril Lavigne     37
+5   Lana Del Rey     33
+
+---Apr/2020---
+          Artist  Count
+1   Taylor Swift    187
+2   Lana Del Rey     35
+3   Foo Fighters     28
+4  Black Sabbath     11
+5       CHVRCHES     10
+
+---May/2020---
+          Artist  Count
+1   Taylor Swift    164
+2       Dua Lipa     47
+3   Foo Fighters     46
+4    Linkin Park     43
+5  Avril Lavigne     39
+
+---Jun/2020---
+          Artist  Count
+1   Taylor Swift    186
+2   Foo Fighters     57
+3   Lana Del Rey     27
+4    Linkin Park     24
+5  Avril Lavigne     22
+
+---Jul/2020---
+            Artist  Count
+1     Taylor Swift    115
+2     Lana Del Rey     49
+3        Lady Gaga     20
+4  Black Eyed Peas     19
+5     Foo Fighters     15
+
+---Agu/2020---
+           Artist  Count
+1        Dua Lipa     56
+2    Lana Del Rey     56
+3    Taylor Swift     23
+4  Kelly Clarkson     18
+5   Avril Lavigne     17
+
+---Sep/2020---
+         Artist  Count
+1      Dua Lipa    117
+2  Taylor Swift     72
+3       Ava Max     63
+4  Foo Fighters     37
+5     Lady Gaga     31
+
+---Oct/2020---
+          Artist  Count
+1   Taylor Swift    127
+2       Dua Lipa     43
+3        Ava Max     42
+4           Muse     19
+5  Stevie Wonder     11
+
+---Nov/2020---
+         Artist  Count
+1  Taylor Swift    310
+2  Lana Del Rey     50
+3   Linkin Park     44
+4       Ava Max     33
+5      Dua Lipa     32
+
+---Dec/2020---
+          Artist  Count
+1   Taylor Swift    239
+2       Dua Lipa     43
+3   Lana Del Rey     36
+4       Slipknot     35
+5  Avril Lavigne     21
+
+---Jan/2021---
+         Artist  Count
+1  Taylor Swift    315
+2  Foo Fighters     41
+3   Linkin Park     35
+4  Lana Del Rey     27
+5      Dua Lipa     23
+
+---Feb/2021---
+                Artist  Count
+1         Taylor Swift    157
+2  The Pretty Reckless     54
+3         Foo Fighters     51
+4             Dua Lipa     44
+5                 HAIM     39
+
+---Mar/2021---
+         Artist  Count
+1  Taylor Swift    362
+2          HAIM     51
+3  Lana Del Rey     43
+4   Linkin Park     41
+5  Foo Fighters     30
+
+---Apr/2021---
+          Artist  Count
+1   Taylor Swift    338
+2   Lana Del Rey     36
+3  Avril Lavigne     35
+4       Dua Lipa     28
+5    Black Pumas     22
+
+---May/2021---
+          Artist  Count
+1   Taylor Swift    216
+2   Foo Fighters     36
+3  Avril Lavigne     31
+4    Miley Cyrus     28
+5   Lana Del Rey     25
+
+---Jun/2021---
+           Artist  Count
+1    Taylor Swift    171
+2  Olivia Rodrigo     37
+3     Linkin Park     28
+4   Avril Lavigne     22
+5   Ariana Grande     20
+
+---Jul/2021---
+         Artist  Count
+1  Taylor Swift     55
+2  Foo Fighters     42
+3     Green Day     23
+4  Lana Del Rey     18
+5       Ava Max     16
+
