@@ -31,7 +31,7 @@ class PlotterFM():
         self.__months_names = 'Jan Feb Mar Apr May Jun Jul Agu Sep Oct Nov Dec'.split()
 
 
-    def __render_barh(self, data: pd.DataFrame, title: str, xlabel: str, ylabel: str, color: str='salmon') -> None:
+    def __render_barh(self, data: pd.DataFrame, title: str, xlabel: str, ylabel: str,  save_it: bool, color: str='salmon') -> None:
         """Calls the barh() method from matplotlibs and customize it based upon the data passed."""
         # setting graph size
         plt.figure(figsize=(10, 5))
@@ -51,11 +51,15 @@ class PlotterFM():
             for index, artist_name in enumerate(data[::-1]['Artist']):
                 plt.text(x=5, y=index-.2, s=artist_name)
 
+        # saving the graph if asked
+        if save_it == True:
+            plt.savefig(f'results/{title.replace(" ", "_").lower()}.png', facecolor='white')
+
         # displaying the graph
         plt.show()
 
 
-    def total_artists_year(self, year: str) -> None:
+    def total_artists_year(self, year: str, save_it: bool=False) -> None:
         """
         Displays a graph with the total count of artists scrobbled in each month of that year.
 
@@ -69,10 +73,10 @@ class PlotterFM():
         total_artists = pd.DataFrame( [self.__analyzer.highlights_of('year', f'{year}-{month+1}').total_artists for month, _ in enumerate(self.__months_names)], columns={'Count'} )
 
         # calling the renderer and displaying the graph to the user
-        self.__render_barh(data=total_artists, title=f'Total Artists Listened in {year}', xlabel='Total Scrobbles', ylabel='Months')
+        self.__render_barh(data=total_artists, title=f'Total Artists Listened in {year}', xlabel='Total Scrobbles', ylabel='Months', save_it=save_it)
 
     
-    def total_albums_year(self, year: str) -> None:
+    def total_albums_year(self, year: str, save_it: bool=False) -> None:
         """
         Displays a graph with the total count of albums scrobbled in each month of that year.
 
@@ -86,10 +90,10 @@ class PlotterFM():
         total_albums = pd.DataFrame( [self.__analyzer.highlights_of('year', f'{year}-{month+1}').total_albums for month, _ in enumerate(self.__months_names)], columns={'Count'} )
 
         # calling the renderer and displaying the graph to the user
-        self.__render_barh(data=total_albums, title=f'Total Albums Listened in {year}', xlabel='Total Scrobbles', ylabel='Months')
+        self.__render_barh(data=total_albums, title=f'Total Albums Listened in {year}', xlabel='Total Scrobbles', ylabel='Months', save_it=save_it)
         
 
-    def total_tracks_year(self, year: str) -> None:
+    def total_tracks_year(self, year: str, save_it: bool=False) -> None:
         """
         Displays a graph with the total count of tracks scrobbled in each month of that year.
 
@@ -103,10 +107,10 @@ class PlotterFM():
         total_tracks = pd.DataFrame( [self.__analyzer.highlights_of('year', f'{year}-{month+1}').total_tracks for month, _ in enumerate(self.__months_names)], columns={'Count'} )
 
         # calling the renderer and displaying the graph to the user
-        self.__render_barh(data=total_tracks, title=f'Total Tracks in {year}', xlabel='Total Scrobbles', ylabel='Months')
+        self.__render_barh(data=total_tracks, title=f'Total Tracks in {year}', xlabel='Total Scrobbles', ylabel='Months', save_it=save_it)
 
     
-    def total_scrobbles_year(self, year: str) -> None:
+    def total_scrobbles_year(self, year: str, save_it: bool=False) -> None:
         """
         Displays a graph with the total count of scrobbles in each month of that year.
 
@@ -120,10 +124,10 @@ class PlotterFM():
         total_scrobbles = pd.DataFrame( [self.__analyzer.highlights_of('year', f'{year}-{month+1}').total_scrobbles for month, _ in enumerate(self.__months_names)], columns={'Count'} )
 
         # calling the renderer and displaying the graph to the user
-        self.__render_barh(data=total_scrobbles, title=f'Total Scrobbles in {year}', xlabel='Total Scrobbles', ylabel='Months')
+        self.__render_barh(data=total_scrobbles, title=f'Total Scrobbles in {year}', xlabel='Total Scrobbles', ylabel='Months', save_it=save_it)
 
 
-    def most_listened_artists(self, year: str) -> None:
+    def most_listened_artists(self, year: str, save_it: bool=False) -> None:
         """
         Displays a graph with the total count of scrobbles of the most listened artist in each month of that year.
 
@@ -137,4 +141,4 @@ class PlotterFM():
         top_artists = pd.DataFrame( [self.__analyzer.highlights_of('year', f'{year}-{month+1}').df_top_artist for month, _ in enumerate(self.__months_names)] ).reset_index(drop=True)
 
         # calling the renderer and displaying the graph to the user
-        self.__render_barh(data=top_artists, title=f'Most Listened Artists in {year}', xlabel='Total Scrobbles', ylabel='Months', color='skyblue')
+        self.__render_barh(data=top_artists, title=f'Most Listened Artists in {year}', xlabel='Total Scrobbles', ylabel='Months', save_it=save_it, color='skyblue')
