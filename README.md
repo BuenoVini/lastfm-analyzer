@@ -113,7 +113,7 @@ Track: Solar Power from Solar Power by Lorde with 7 scrobbles
 | 3 | Taylor Swift | Fearless (Taylor's Version) | 9 |
 | 4 | Avril Lavigne | The Best Damn Thing (Expanded Edition) | 5 |
 
-## Contrubuting
+## Contributing
 This project is **not** Open Source. You cannot modify or redistribute this code without explicit permission.
 
 This repository is for practicing my skills only and does not represent a final product.
