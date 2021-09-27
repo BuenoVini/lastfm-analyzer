@@ -65,6 +65,7 @@ class PlotterFM():
 
         Parameters:
             year: the desired year in 'YYYY' format.
+            save_it: whether you wish to save the graph as am image or not.
 
         Returns:
             None.
@@ -82,6 +83,7 @@ class PlotterFM():
 
         Parameters:
             year: the desired year in 'YYYY' format.
+            save_it: whether you wish to save the graph as am image or not.
 
         Returns:
             None.
@@ -99,6 +101,7 @@ class PlotterFM():
 
         Parameters:
             year: the desired year in 'YYYY' format.
+            save_it: whether you wish to save the graph as am image or not.
 
         Returns:
             None.
@@ -116,6 +119,7 @@ class PlotterFM():
 
         Parameters:
             year: the desired year in 'YYYY' format.
+            save_it: whether you wish to save the graph as am image or not.
 
         Returns:
             None.
@@ -133,6 +137,7 @@ class PlotterFM():
 
         Parameters:
             year: the desired year in 'YYYY' format.
+            save_it: whether you wish to save the graph as am image or not.
 
         Returns:
             None.
