@@ -1,0 +1,73 @@
+--Top 5 Artists Overall--
+          Artist  Counts
+1   Taylor Swift    4248
+2   Foo Fighters     844
+3   Lana Del Rey     785
+4    Linkin Park     596
+5  Avril Lavigne     579
+
+--Taylor Swift--
+                                              Track  Counts
+1                                       Blank Space      83
+2                                      Shake It Off      64
+3                                             Lover      62
+4                                               Red      52
+5                                   The Story of Us      52
+6                             You Need to Calm Down      52
+7   ME! (feat. Brendon Urie of Panic! at the Disco)      51
+8                          Look What You Made Me Do      51
+9                                       Paper Rings      48
+10                                         Gorgeous      47
+
+--Foo Fighters--
+                     Track  Counts
+1            The Pretender      25
+2              All My Life      25
+3               Let It Die      23
+4                     Walk      22
+5               These Days      22
+6     Medicine at Midnight      20
+7              Best of You      20
+8             Learn to Fly      19
+9           Bridge Burning      19
+10  Something from Nothing      18
+
+--Lana Del Rey--
+                                                Track  Counts
+1                                         Born to Die      51
+2                                       Dark Paradise      46
+3                          Mariners Apartment Complex      33
+4                                  Summertime Sadness      26
+5                                     National Anthem      22
+6                                   High by the Beach      19
+7   hope is a dangerous thing for a woman like me ...      18
+8           When the World Was at War We Kept Dancing      15
+9                                          West Coast      14
+10                           Video Games - Remastered      13
+
+--Linkin Park--
+              Track  Counts
+1             Faint      22
+2          Given Up      16
+3          Papercut      16
+4              Numb      15
+5          Crawling      14
+6         Figure.09      13
+7   From the Inside      13
+8        In the End      13
+9    No More Sorrow      13
+10       Don't Stay      12
+
+--Avril Lavigne--
+                  Track  Counts
+1                   Hot      28
+2           Complicated      26
+3                 Smile      25
+4       My Happy Ending      17
+5         Don't Tell Me      16
+6               Runaway      15
+7    One of Those Girls      15
+8         What the Hell      15
+9            Girlfriend      15
+10  The Best Damn Thing      14
+

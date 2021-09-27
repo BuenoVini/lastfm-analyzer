@@ -168,9 +168,25 @@
 
 ---Jul/2021---
          Artist  Count
-1  Taylor Swift     55
-2  Foo Fighters     42
-3     Green Day     23
-4  Lana Del Rey     18
-5       Ava Max     16
+1  Taylor Swift    147
+2  Foo Fighters     55
+3  Lana Del Rey     34
+4   Linkin Park     34
+5     Lady Gaga     26
+
+---Agu/2021---
+                Artist  Count
+1         Taylor Swift    191
+2                Lorde     34
+3             Bee Gees     25
+4  The Pretty Reckless     19
+5        Avril Lavigne     17
+
+---Sep/2021---
+          Artist  Count
+1   Taylor Swift    170
+2  Avril Lavigne     23
+3    Tina Turner     22
+4   Foo Fighters     21
+5   Lana Del Rey     20
 
