@@ -1,9 +1,9 @@
 # lastfm-analyzer
-My motivation was to work on a project that could showcase my skills using Data Science technologies in Python. So I decided to create this repository, combining my love for writing code and listening to music.
+My motivation has been to work on a project that can showcase my skills using Data Science technologies in Python. So I decided to create this repository, combining my love for writing code and listening to music.
 
 Last.fm is a service that helps users keep track of their musical taste. I have been using it since 2019. Feel free to check my [profile](https://www.last.fm/user/Vini_Bueno) and see my scrobbles.
 
-What I **learned** during the development of this project:
+What I have **learned** during the development of this project:
 - Requesting data from Last.fm servers using their [API](https://www.last.fm/api/intro);
 - Working with timezones and UNIX timestamp;
 - Using Data Analysis technologies such as Numpy, Pandas, and Matplotlib;
