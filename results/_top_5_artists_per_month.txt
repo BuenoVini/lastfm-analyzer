@@ -184,9 +184,33 @@
 
 ---Sep/2021---
           Artist  Count
-1   Taylor Swift    170
-2  Avril Lavigne     23
-3    Tina Turner     22
-4   Foo Fighters     21
-5   Lana Del Rey     20
+1   Taylor Swift    192
+2           HAIM     45
+3  Avril Lavigne     26
+4   Foo Fighters     25
+5   Lana Del Rey     25
+
+---Oct/2021---
+         Artist  Count
+1  Taylor Swift     76
+2  Lana Del Rey     38
+3   Linkin Park     36
+4      Bon Jovi     27
+5  Foo Fighters     20
+
+---Nov/2021---
+                Artist  Count
+1         Taylor Swift    246
+2  The Pretty Reckless     37
+3         Foo Fighters     30
+4      Black Eyed Peas     19
+5              Ava Max     15
+
+---Dec/2021---
+          Artist  Count
+1   Taylor Swift    112
+2    Linkin Park     21
+3  Avril Lavigne     19
+4    Miley Cyrus     17
+5           HAIM     16
 
