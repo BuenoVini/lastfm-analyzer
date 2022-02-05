@@ -1,6 +1,7 @@
 from AnalyzerFM import AnalyzerFM
 import matplotlib.pyplot as plt # type: ignore
 import pandas as pd # type: ignore
+import os # type: ignore
 
 class PlotterFM():
     """
@@ -34,7 +35,7 @@ class PlotterFM():
     def __render_barh(self, data: pd.DataFrame, title: str, xlabel: str, ylabel: str,  save_it: bool, color: str='salmon') -> None:
         """Calls the barh() method from matplotlibs and customize it based upon the data passed."""
         # setting graph size
-        plt.figure(figsize=(10, 5))
+        plt.figure(figsize=(10, 5), facecolor='white')
 
         # setting graph title and labels
         plt.title(title)
@@ -53,6 +54,8 @@ class PlotterFM():
 
         # saving the graph if asked
         if save_it == True:
+            if not os.path.isdir('results/'):
+                os.mkdir('results/')
             plt.savefig(f'results/{title.replace(" ", "_").lower()}.png', facecolor='white')
 
         # displaying the graph
